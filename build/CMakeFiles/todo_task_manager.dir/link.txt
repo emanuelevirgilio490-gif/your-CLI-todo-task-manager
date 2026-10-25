@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/todo_task_manager.dir/src/main.cpp.o -o todo_task_manager 
