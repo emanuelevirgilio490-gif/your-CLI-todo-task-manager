@@ -1,3 +1,10 @@
+/*
+This file.hpp contains all of the constant
+for the file and exit codes used in this projects
+
+I used constant instead of only numbers for readability
+*/
+
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 

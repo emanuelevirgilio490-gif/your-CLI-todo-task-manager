@@ -1,3 +1,8 @@
+/*
+In this file.hpp there are all of the functions needed for
+executing commands from the user in the 'shell'
+*/
+
 #ifndef COMMANDS_EXEC_HPP
 #define COMMANDS_EXEC_HPP
 

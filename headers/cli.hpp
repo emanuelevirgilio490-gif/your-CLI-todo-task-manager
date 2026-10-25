@@ -1,3 +1,14 @@
+/*
+This file.hpp is for the CLI interface
+It's like a shell
+
+what does it do:
+# get the command from the user
+# convert it
+# calls other functions to execute those commands
+# return the exit codes (defined in defines.hpp)
+*/
+
 #ifndef CLI_HPP
 #define CLI_HPP
 
@@ -5,10 +16,8 @@
 #include "defines.hpp"
 #include <algorithm>
 #include <cctype>
-#include <chrono>
 #include <cstdlib>
 #include <ctime>
-#include <iomanip>
 #include <iostream>
 
 namespace CliInterface {
