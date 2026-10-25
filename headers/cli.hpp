@@ -5,11 +5,22 @@
 #include "defines.hpp"
 #include <algorithm>
 #include <cctype>
+#include <chrono>
 #include <cstdlib>
+#include <ctime>
+#include <iomanip>
 #include <iostream>
 
 namespace CliInterface {
-enum class ValidCommands { HELP = 0, QUIT, ADD_TASK, SHOW_TASK, NOT_DEFINED };
+enum class ValidCommands {
+  HELP = 0,
+  QUIT,
+  ADD_TASK,
+  SHOW_TASK,
+  CLEAR,
+  TODAY,
+  NOT_DEFINED
+};
 
 class CLI {
   std::string last_command{};
@@ -21,6 +32,7 @@ public:
 
   // getters
   std::string GetCommand(void) {
+
     std::cout << "> ";
     std::getline(std::cin, last_command);
 
@@ -45,7 +57,12 @@ public:
       last_command_enum = ValidCommands::ADD_TASK;
     } else if (command == "show tasks") {
       last_command_enum = ValidCommands::SHOW_TASK;
+    } else if (command == "clear") {
+      last_command_enum = ValidCommands::CLEAR;
+    } else if (command == "today") {
+      last_command_enum = ValidCommands::TODAY;
     }
+
     return last_command_enum;
   }
 
@@ -69,6 +86,12 @@ public:
     case ValidCommands::SHOW_TASK:
       std::cout << "Showing tasks...\n";
       command_success = CommandExecution::PrintTasks();
+      break;
+    case ValidCommands::CLEAR:
+      CommandExecution::Clear();
+      break;
+    case ValidCommands::TODAY:
+      CommandExecution::PrintToday();
       break;
     default:
       std::cout << "the command is not handled\n";

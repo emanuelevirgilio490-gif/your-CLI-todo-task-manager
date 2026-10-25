@@ -54,6 +54,16 @@ inline int PrintTasks(void) {
 
   return EXIT_SUCCESS;
 }
+
+inline void Clear(void) { std::cout << "\e[H\e[J"; }
+
+inline void PrintToday(void) {
+  // print the current date
+  auto current_date =
+      std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  std::cout << "today is "
+            << std::put_time(std::localtime(&current_date), "%d/%m/%Y") << '\n';
+}
 }; // namespace CommandExecution
 
 #endif
