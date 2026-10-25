@@ -1,8 +1,13 @@
 #ifndef COMMANDS_EXEC_HPP
 #define COMMANDS_EXEC_HPP
 
+#include "defines.hpp"
 #include "tasks.hpp"
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace CommandExecution {
 inline void PrintHelp(void) {
@@ -15,7 +20,40 @@ inline void Quit(void) {
   exit(0);
 }
 
-inline int AddTask(const Tasks::Task &task) {}
+inline int AddTask(const Tasks::Task &task) {
+  std::ifstream file(FILE_FULL_PATH);
+  if (!file.is_open()) {
+    std::cout << "ERROR: File: " << FILE_FULL_PATH << " Does not exist!\n";
+    return FILE_DOES_NOT_EXIST;
+  }
+
+  std::cout << "File does exist\nadd task is still in developement\n";
+  return EXIT_SUCCESS;
+}
+
+inline int PrintTasks(void) {
+  // checking if the file exist
+  std::ifstream file(FILE_FULL_PATH);
+  if (!file.is_open()) {
+    std::cout << "ERROR: File: " << FILE_FULL_PATH << " Does not exist!\n";
+    return FILE_DOES_NOT_EXIST;
+  }
+
+  // reading the file
+  nlohmann::json data_tasks = nlohmann::json::parse(file);
+
+  // printing the content of the file
+  std::cout << "tasks:\n";
+  for (auto &[task_name, dict] : data_tasks.items()) {
+    std::cout << "\ttask: " << task_name << '\n';
+    for (auto &[key, value] : dict.items()) {
+      std::cout << '\t' << key << " : " << value << '\n';
+    }
+    std::cout << '\n';
+  }
+
+  return EXIT_SUCCESS;
+}
 }; // namespace CommandExecution
 
 #endif

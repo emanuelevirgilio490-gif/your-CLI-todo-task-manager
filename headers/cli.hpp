@@ -9,7 +9,7 @@
 #include <iostream>
 
 namespace CliInterface {
-enum class ValidCommands { HELP = 0, QUIT, ADD_TASK, NOT_DEFINED };
+enum class ValidCommands { HELP = 0, QUIT, ADD_TASK, SHOW_TASK, NOT_DEFINED };
 
 class CLI {
   std::string last_command{};
@@ -41,12 +41,14 @@ public:
       last_command_enum = ValidCommands::QUIT;
     } else if (command == "help") {
       last_command_enum = ValidCommands::HELP;
-    } else if (command == "add-task") {
+    } else if (command == "add task") {
       last_command_enum = ValidCommands::ADD_TASK;
+    } else if (command == "show tasks") {
+      last_command_enum = ValidCommands::SHOW_TASK;
     }
-
     return last_command_enum;
   }
+
   int ExecCommand(ValidCommands c_enum) {
     int command_success = 0;
     switch (c_enum) {
@@ -63,6 +65,10 @@ public:
       break;
     case ValidCommands::ADD_TASK:
       std::cout << "Adding task...";
+      break;
+    case ValidCommands::SHOW_TASK:
+      std::cout << "Showing tasks...\n";
+      command_success = CommandExecution::PrintTasks();
       break;
     default:
       std::cout << "the command is not handled\n";

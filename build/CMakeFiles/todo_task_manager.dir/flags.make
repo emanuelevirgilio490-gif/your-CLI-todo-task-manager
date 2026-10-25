@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/emanuele/Desktop/programmazione/todo-tasks/headers
+CXX_INCLUDES = -I/home/emanuele/Desktop/programmazione/productivity-cli/headers
 
 CXX_FLAGS = 
 

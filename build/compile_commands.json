@@ -1,8 +1,8 @@
 [
 {
-  "directory": "/home/emanuele/Desktop/programmazione/todo-tasks/build",
-  "command": "/usr/bin/c++  -I/home/emanuele/Desktop/programmazione/todo-tasks/headers  -o CMakeFiles/todo_task_manager.dir/src/main.cpp.o -c /home/emanuele/Desktop/programmazione/todo-tasks/src/main.cpp",
-  "file": "/home/emanuele/Desktop/programmazione/todo-tasks/src/main.cpp",
+  "directory": "/home/emanuele/Desktop/programmazione/productivity-cli/build",
+  "command": "/usr/bin/c++  -I/home/emanuele/Desktop/programmazione/productivity-cli/headers  -o CMakeFiles/todo_task_manager.dir/src/main.cpp.o -c /home/emanuele/Desktop/programmazione/productivity-cli/src/main.cpp",
+  "file": "/home/emanuele/Desktop/programmazione/productivity-cli/src/main.cpp",
   "output": "CMakeFiles/todo_task_manager.dir/src/main.cpp.o"
 }
 ]
