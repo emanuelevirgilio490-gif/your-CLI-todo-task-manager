@@ -1,6 +1,7 @@
 #ifndef COMMANDS_EXEC_HPP
 #define COMMANDS_EXEC_HPP
 
+#include "tasks.hpp"
 #include <iostream>
 
 namespace CommandExecution {
@@ -13,6 +14,8 @@ inline void Quit(void) {
   std::cout << "Bye! Have a nice day!\n";
   exit(0);
 }
+
+inline int AddTask(const Tasks::Task &task) {}
 }; // namespace CommandExecution
 
 #endif
