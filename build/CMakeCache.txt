@@ -122,7 +122,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=todo_task_manager
+CMAKE_PROJECT_NAME:STATIC=productivity-cli
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -188,6 +188,15 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 // during the make.  This is useful for debugging only. With Visual
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
+
+//Value Computed by CMake
+productivity-cli_BINARY_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli/build
+
+//Value Computed by CMake
+productivity-cli_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+productivity-cli_SOURCE_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli
 
 //Value Computed by CMake
 todo_task_manager_BINARY_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli/build

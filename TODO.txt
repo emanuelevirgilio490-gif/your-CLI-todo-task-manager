@@ -1,0 +1,3 @@
+# add title at the first log in
+# create a tui
+# create a config.lua

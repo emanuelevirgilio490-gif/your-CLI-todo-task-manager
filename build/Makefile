@@ -117,41 +117,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named todo_task_manager
+# Target rules for targets named cli
 
 # Build rule for target.
-todo_task_manager: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 todo_task_manager
-.PHONY : todo_task_manager
+cli: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 cli
+.PHONY : cli
 
 # fast build rule for target.
-todo_task_manager/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/todo_task_manager.dir/build.make CMakeFiles/todo_task_manager.dir/build
-.PHONY : todo_task_manager/fast
+cli/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/build
+.PHONY : cli/fast
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+cli/src/cli.o: cli/src/cli.cpp.o
+.PHONY : cli/src/cli.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/todo_task_manager.dir/build.make CMakeFiles/todo_task_manager.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+cli/src/cli.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/cli/src/cli.cpp.o
+.PHONY : cli/src/cli.cpp.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
+cli/src/cli.i: cli/src/cli.cpp.i
+.PHONY : cli/src/cli.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/todo_task_manager.dir/build.make CMakeFiles/todo_task_manager.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+cli/src/cli.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/cli/src/cli.cpp.i
+.PHONY : cli/src/cli.cpp.i
 
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
+cli/src/cli.s: cli/src/cli.cpp.s
+.PHONY : cli/src/cli.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/todo_task_manager.dir/build.make CMakeFiles/todo_task_manager.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+cli/src/cli.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/cli/src/cli.cpp.s
+.PHONY : cli/src/cli.cpp.s
 
 # Help Target
 help:
@@ -161,10 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... todo_task_manager"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
+	@echo "... cli"
+	@echo "... cli/src/cli.o"
+	@echo "... cli/src/cli.i"
+	@echo "... cli/src/cli.s"
 .PHONY : help
 
 

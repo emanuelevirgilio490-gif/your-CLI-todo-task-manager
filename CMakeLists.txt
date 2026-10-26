@@ -1,5 +1,16 @@
-cmake_minimum_required(VERSION 3.28)
-project(todo_task_manager LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.16)
 
-add_executable(todo_task_manager src/main.cpp)
-target_include_directories(todo_task_manager PRIVATE "${CMAKE_SOURCE_DIR}/headers")
+project(productivity-cli LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_executable(cli
+    cli/src/cli.cpp
+)
+
+target_include_directories(cli PRIVATE
+    cli/header
+    productivity-manager
+)

@@ -40,5 +40,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/todo_task_manager.dir/DependInfo.cmake"
+  "CMakeFiles/cli.dir/DependInfo.cmake"
   )
