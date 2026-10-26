@@ -8,7 +8,7 @@ I spend a lot of time in the terminal, so I tried using a TODO task manager. Hon
 
 ## What does it do?
 
-Productivity CLI is a simple and convenient place to plan your day using quick terminal commands!
+Productivity CLI is a simple and convenient place to plan your day using quick terminal commands! There is also a TUI, however is still in development
 
 ## How to install it
 
