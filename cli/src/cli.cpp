@@ -17,6 +17,8 @@ int main(void) {
 
   CliInterface::CLI cli;
 
+  cli.PrintTitle();
+
   while (!cli.ShouldExit()) {
     // get command
     std::string command_str = cli.GetCommand();
@@ -42,6 +44,7 @@ int main(void) {
     }
 
     cli.Reset();
+    putchar('\n');
   }
 
   // prints an hello

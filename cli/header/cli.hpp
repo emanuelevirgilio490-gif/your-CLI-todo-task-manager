@@ -53,6 +53,14 @@ public:
 
   // ----------------- //
 
+  void PrintTitle(void) {
+    puts("|------------------------|");
+    puts("|                        |");
+    puts("|\033[1;0m    PRODUCTIVITY-CLI    \033[0m|");
+    puts("|                        |");
+    puts("|------------------------|");
+  }
+
   void ConvertToLower(std::string &s) {
     std::transform(s.begin(), s.end(), s.begin(),
                    [](uint c) { return std::tolower(c); });
