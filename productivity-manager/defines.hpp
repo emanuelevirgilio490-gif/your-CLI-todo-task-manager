@@ -26,5 +26,7 @@ const std::string FILE_FULL_PATH = USER_HOME + "/" + FILE_FULL_NAME;
 // exit codes
 const uint8_t ENUM_NOT_DEFINED = 1;
 const uint8_t FILE_DOES_NOT_EXIST = -1;
+const uint8_t TYPE_NOT_VALID = 2;
+const uint8_t FILE_NOT_OPEN = -2;
 
 #endif

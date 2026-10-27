@@ -14,6 +14,8 @@ what does it do:
 
 #include "commands_exec_CLI.hpp"
 #include "defines.hpp"
+#include "manager.hpp"
+#include "tasks.hpp"
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -41,7 +43,6 @@ public:
 
   // getters
   std::string GetCommand(void) {
-
     std::cout << "> ";
     std::getline(std::cin, last_command);
 
@@ -89,9 +90,17 @@ public:
       command_success = ENUM_NOT_DEFINED;
       std::cout << "NOT DEFINED\n";
       break;
-    case ValidCommands::ADD_TASK:
-      std::cout << "Adding task...";
-      break;
+    case ValidCommands::ADD_TASK: {
+      std::cout << "Adding task...\n";
+      Tasks::Task *task = CommandExecution::GetTask();
+      if (task == nullptr)
+        return TYPE_NOT_VALID;
+      Manager::AddTask(task);
+
+      // use the task to write it on the file
+
+      delete task;
+    } break;
     case ValidCommands::SHOW_TASK:
       std::cout << "Showing tasks...\n";
       command_success = CommandExecution::PrintTasks();

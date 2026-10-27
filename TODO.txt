@@ -1,3 +1,7 @@
 # add title at the first log in
 # create a tui
 # create a config.lua
+
+# tasks:
+1. fare in modo che il file si in append mode
+2. fare in modo che le task vengano salvate correttamente

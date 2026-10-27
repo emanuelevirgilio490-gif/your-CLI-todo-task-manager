@@ -1,3 +1,3 @@
-cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
-build/./todo_task_manager
+build/./cli

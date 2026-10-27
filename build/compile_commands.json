@@ -1,7 +1,7 @@
 [
 {
   "directory": "/home/emanuele/Desktop/programmazione/productivity-cli/build",
-  "command": "/usr/bin/c++  -I/home/emanuele/Desktop/programmazione/productivity-cli/cli/header -I/home/emanuele/Desktop/programmazione/productivity-cli/productivity-manager -std=gnu++20 -o CMakeFiles/cli.dir/cli/src/cli.cpp.o -c /home/emanuele/Desktop/programmazione/productivity-cli/cli/src/cli.cpp",
+  "command": "/usr/bin/c++  -I/home/emanuele/Desktop/programmazione/productivity-cli/cli/header -I/home/emanuele/Desktop/programmazione/productivity-cli/productivity-manager -g -std=gnu++20 -o CMakeFiles/cli.dir/cli/src/cli.cpp.o -c /home/emanuele/Desktop/programmazione/productivity-cli/cli/src/cli.cpp",
   "file": "/home/emanuele/Desktop/programmazione/productivity-cli/cli/src/cli.cpp",
   "output": "CMakeFiles/cli.dir/cli/src/cli.cpp.o"
 }

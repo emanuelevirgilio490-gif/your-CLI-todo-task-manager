@@ -1,12 +1,10 @@
 #include "cli.hpp"
 #include "commands_exec_CLI.hpp"
+#include "manager.hpp"
 #include "tasks.hpp"
 #include <csignal>
 #include <iostream>
-#define DEBUG_MODE
-
-// the global task
-Tasks::Task task;
+// #define DEBUG_MODE
 
 // handler for ctrl + c
 void SigIntHandler(int sig) {
@@ -40,7 +38,7 @@ int main(void) {
     int exit_code = cli.ExecCommand(command_enum);
     if (exit_code != 0) {
       // check different exit code
-      std::cout << "Error: command not valid\n";
+      std::cout << "Error: some errors occured\n";
     }
 
     cli.Reset();
