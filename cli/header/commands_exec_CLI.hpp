@@ -29,7 +29,7 @@ inline void Quit(void) {
 inline Tasks::Task *GetTask(void) {
   std::cout << "DEBUG: Entered get task\n";
   Tasks::Task *task = new Tasks::Task;
-  std::string type_str{};
+  int type = 0;
 
   std::cout << "Add Task:\n";
 
@@ -44,22 +44,26 @@ inline Tasks::Task *GetTask(void) {
   // type
   bool valid = false;
   do {
-    std::cout << "Add a type: ";
-    std::getline(std::cin, type_str);
+    // input
+    std::cout << "Add a type(0-2): ";
+    std::cin >> type;
 
-    // check if the type is valid
-    for (auto str : Tasks::Type_to_str) {
-      if (type_str == str)
-        valid = true;
-    }
-
-    if (type_str.length() == 1 && type_str[0] == 'q') {
+    // check if the type is correct
+    if (type == 60)
       return nullptr;
-    } else if (!valid) {
-      std::cout << "Type not valid, 'q' to quit\nthen you can read the "
-                   "possible type typing 'help' in the cli\n";
-    }
+    else if (type >= 0 && type <= 2)
+      valid = true;
+    else
+      std::cout << "Type not valid: try again (60 to quit)\n";
   } while (!valid);
+
+  // clean the new line from the buffer
+  std::cin.get();
+
+  task->type = type == 0   ? Tasks::Type::OPTIONAL
+               : type == 1 ? Tasks::Type::NORMAL
+               : type == 2 ? Tasks::Type::URGENT
+                           : Tasks::Type::URGENT;
 
   return task;
 }

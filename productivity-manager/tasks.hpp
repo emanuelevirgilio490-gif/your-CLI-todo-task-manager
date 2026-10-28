@@ -13,7 +13,7 @@ to organize tasks
 
 namespace Tasks {
 enum class Type { URGENT = 0, NORMAL, OPTIONAL, NOT_DEFINED };
-inline std::array<std::string, 10> Type_to_str{
+inline std::array<std::string, 10> type_to_str{
     {"urgent", "normal", "optional", "not defined"}};
 
 struct Task {

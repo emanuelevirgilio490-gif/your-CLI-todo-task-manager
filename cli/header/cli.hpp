@@ -96,13 +96,15 @@ public:
       break;
     case ValidCommands::NOT_DEFINED:
       command_success = ENUM_NOT_DEFINED;
-      std::cout << "NOT DEFINED\n";
       break;
     case ValidCommands::ADD_TASK: {
-      std::cout << "Adding task...\n";
       Tasks::Task *task = CommandExecution::GetTask();
-      if (task == nullptr)
+      if (task == nullptr) {
+        std::cout << "Exit...\n";
         return TYPE_NOT_VALID;
+      }
+
+      std::cout << "Adding task...\n";
       Manager::AddTask(task);
 
       // use the task to write it on the file

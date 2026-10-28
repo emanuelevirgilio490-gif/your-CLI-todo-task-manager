@@ -4,4 +4,6 @@
 
 # tasks:
 1. fare in modo che il file si in append mode
-2. fare in modo che le task vengano salvate correttamente
+
+# bug
+1. fare in modo che non succeda solo not defined

@@ -17,8 +17,11 @@ int main(void) {
 
   CliInterface::CLI cli;
 
+  // title
+  CommandExecution::Clear();
   cli.PrintTitle();
 
+  // main loop
   while (!cli.ShouldExit()) {
     // get command
     std::string command_str = cli.GetCommand();
@@ -41,10 +44,13 @@ int main(void) {
     if (exit_code != 0) {
       // check different exit code
       std::cout << "Error: some errors occured\n";
+      std::cout << "exit code: " << exit_code << '\n';
     }
 
+    if (!(cli.GetLastCommand() == "clear"))
+      putchar('\n');
+
     cli.Reset();
-    putchar('\n');
   }
 
   // prints an hello
