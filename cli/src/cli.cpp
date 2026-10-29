@@ -16,6 +16,7 @@ int main(void) {
   signal(SIGINT, SigIntHandler);
 
   CliInterface::CLI cli;
+  CliInterface::AutoComplete::SetFunction();
 
   // title
   CommandExecution::Clear();
@@ -33,7 +34,7 @@ int main(void) {
     // convert it to lower and to an enum
     cli.ConvertToLower(cli.GetLastCommand());
     command_str = cli.GetLastCommand();
-    CliInterface::ValidCommands command_enum = cli.ConvertCommand(command_str);
+    Manager::ValidCommands command_enum = cli.ConvertCommand(command_str);
 
 #ifdef DEBUG_MODE
     std::cout << "DEBUG: Last command = " << cli.GetLastCommand() << '\n';
@@ -43,10 +44,10 @@ int main(void) {
     int exit_code = cli.ExecCommand(command_enum);
     if (exit_code != 0) {
       // check different exit code
-      std::cout << "Error: some errors occured\n";
       std::cout << "exit code: " << exit_code << '\n';
     }
 
+    // newline at the end of the command
     if (!(cli.GetLastCommand() == "clear"))
       putchar('\n');
 

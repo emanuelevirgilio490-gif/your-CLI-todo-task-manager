@@ -26,6 +26,10 @@ from the project directory.
 
 ## AI usage
 
-I didn't use AI to write the actual code for Productivity CLI. However, I did use it as a quick reference while programming.
+I used AI only for the readline and auto completion stuff. Why? Well because
+the doc is useless or it's hard to follow and I honestly a little bit Vibe Coded
+this stuff. Not because I like Vibe Coding but because readline, in my opinion
+is THE WORSE! I'm sorry, but I need to say that the stress and poor doc...
+Maybe I'm too much stressed for taking 1h and 25m to implement readline -_-
 
 The reference examples I used are available in the `test/` directory.

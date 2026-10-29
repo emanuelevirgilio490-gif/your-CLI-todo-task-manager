@@ -16,8 +16,17 @@ enum class ValidCommands {
   SHOW_TASK,
   CLEAR,
   TODAY,
-  NOT_DEFINED
+  NOT_DEFINED,
+  NOTHING
 };
+
+inline char *commands_str[] = {(char *)"help",
+                               (char *)"quit",
+                               (char *)"add task",
+                               (char *)"show tasks",
+                               (char *)"clear",
+                               (char *)"today",
+                               nullptr};
 
 inline int AddTask(const Tasks::Task *t) {
   std::ofstream file(FILE_FULL_PATH);

@@ -21,35 +21,69 @@ what does it do:
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <readline/history.h>
+#include <readline/readline.h>
 
 namespace CliInterface {
-enum class ValidCommands {
-  HELP = 0,
-  QUIT,
-  ADD_TASK,
-  SHOW_TASK,
-  CLEAR,
-  TODAY,
-  NOT_DEFINED
-};
+namespace AutoComplete {
+inline char *GetRawInput(const char *prompt) {
+  char *raw_input = readline(prompt);
+  return raw_input;
+}
+
+// Funzione che viene chiamata quando premiamo Tab
+inline int CustomComplete(int count, int key) {
+  // Prendiamo quello che l'utente ha scritto finora sulla riga
+  std::string current(rl_line_buffer);
+
+  // Cerchiamo un comando che inizi con quello che ha scritto l'utente
+  for (int i = 0; Manager::commands_str[i] != nullptr; ++i) {
+    std::string cmd(Manager::commands_str[i]);
+    // Se il comando inizia con il testo digitato e non è già completo
+    if (cmd.rfind(current, 0) == 0 && cmd != current) {
+      // Calcoliamo la parte mancante da aggiungere
+      std::string missing = cmd.substr(current.length());
+
+      // FORZIAMO L'INSERIMENTO DEL TESTO MANCANTE!
+      rl_insert_text(missing.c_str());
+      return 0;
+    }
+  }
+
+  return 0;
+}
+
+inline void SetFunction(void) {
+  // Disattivammo il vecchio sistema di completamento automatico bacato
+  rl_attempted_completion_function = nullptr;
+
+  // Associamo il tasto Tab (codice 9) alla nostra funzione personalizzata!
+  rl_bind_key(9, CustomComplete);
+}
+}; // namespace AutoComplete
 
 class CLI {
   std::string last_command{};
   bool exit;
-  ValidCommands last_command_enum;
+  Manager::ValidCommands last_command_enum;
 
 public:
-  CLI(void) { last_command_enum = ValidCommands::NOT_DEFINED; }
+  CLI(void) { last_command_enum = Manager::ValidCommands::NOT_DEFINED; }
 
   // getters
   std::string GetCommand(void) {
-    std::cout << "> ";
-    std::getline(std::cin, last_command);
+    char *input = AutoComplete::GetRawInput("> ");
+    std::cout << "raw input = " << input << '\n';
+    last_command = std::string(input);
+    std::cout << "last_command = " << last_command << '\n';
+
+    add_history(input);
+    free(input);
 
     return last_command;
   }
   std::string &GetLastCommand(void) { return last_command; }
-  ValidCommands GetCommandEnum(void) { return last_command_enum; }
+  Manager::ValidCommands GetCommandEnum(void) { return last_command_enum; }
 
   // ----------------- //
 
@@ -66,38 +100,40 @@ public:
                    [](uint c) { return std::tolower(c); });
   }
 
-  ValidCommands ConvertCommand(std::string command) {
+  Manager::ValidCommands ConvertCommand(std::string command) {
     if (command == "quit") {
-      last_command_enum = ValidCommands::QUIT;
+      last_command_enum = Manager::ValidCommands::QUIT;
     } else if (command == "help") {
-      last_command_enum = ValidCommands::HELP;
+      last_command_enum = Manager::ValidCommands::HELP;
     } else if (command == "add task") {
-      last_command_enum = ValidCommands::ADD_TASK;
+      last_command_enum = Manager::ValidCommands::ADD_TASK;
     } else if (command == "show tasks") {
-      last_command_enum = ValidCommands::SHOW_TASK;
+      last_command_enum = Manager::ValidCommands::SHOW_TASK;
     } else if (command == "clear") {
-      last_command_enum = ValidCommands::CLEAR;
+      last_command_enum = Manager::ValidCommands::CLEAR;
     } else if (command == "today") {
-      last_command_enum = ValidCommands::TODAY;
+      last_command_enum = Manager::ValidCommands::TODAY;
+    } else if (command.empty()) {
+      last_command_enum = Manager::ValidCommands::NOTHING;
     }
 
     return last_command_enum;
   }
 
-  int ExecCommand(ValidCommands c_enum) {
+  int ExecCommand(Manager::ValidCommands c_enum) {
     int command_success = 0;
     switch (c_enum) {
-    case ValidCommands::QUIT:
+    case Manager::ValidCommands::QUIT:
       exit = true;
       std::cout << "Exit...\n";
       break;
-    case ValidCommands::HELP:
+    case Manager::ValidCommands::HELP:
       CommandExecution::PrintHelp();
       break;
-    case ValidCommands::NOT_DEFINED:
+    case Manager::ValidCommands::NOT_DEFINED:
       command_success = ENUM_NOT_DEFINED;
       break;
-    case ValidCommands::ADD_TASK: {
+    case Manager::ValidCommands::ADD_TASK: {
       Tasks::Task *task = CommandExecution::GetTask();
       if (task == nullptr) {
         std::cout << "Exit...\n";
@@ -111,15 +147,17 @@ public:
 
       delete task;
     } break;
-    case ValidCommands::SHOW_TASK:
+    case Manager::ValidCommands::SHOW_TASK:
       std::cout << "Showing tasks...\n";
       command_success = CommandExecution::PrintTasks();
       break;
-    case ValidCommands::CLEAR:
+    case Manager::ValidCommands::CLEAR:
       CommandExecution::Clear();
       break;
-    case ValidCommands::TODAY:
+    case Manager::ValidCommands::TODAY:
       CommandExecution::PrintToday();
+      break;
+    case Manager::ValidCommands::NOTHING:
       break;
     default:
       std::cout << "the command is not handled\n";
@@ -132,7 +170,7 @@ public:
 
   void Reset(void) {
     last_command = "";
-    last_command_enum = ValidCommands::NOT_DEFINED;
+    last_command_enum = Manager::ValidCommands::NOT_DEFINED;
   }
 };
 }; // namespace CliInterface
