@@ -101,6 +101,18 @@ inline void PrintToday(void) {
   std::cout << "today is "
             << std::put_time(std::localtime(&current_date), "%d/%m/%Y") << '\n';
 }
+
+inline void ClearFile(void) {
+  std::cout << "clearing the file...\n";
+
+  int success = Manager::ClearFile();
+  if (success == FILE_NOT_OPEN) {
+    std::cout << "Error: file not open, exiting...\n";
+    return;
+  }
+
+  std::cout << "file cleared\n";
+}
 }; // namespace CommandExecution
 
 #endif

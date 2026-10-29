@@ -3,6 +3,7 @@
 
 #include "defines.hpp"
 #include "tasks.hpp"
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -29,9 +30,27 @@ inline char *commands_str[] = {(char *)"help",
                                nullptr};
 
 inline int AddTask(const Tasks::Task *t) {
-  std::ofstream file(FILE_FULL_PATH);
+  std::ifstream file_in(FILE_FULL_PATH);
 
-  if (!file.is_open()) {
+  if (!file_in.is_open()) {
+    return FILE_NOT_OPEN;
+  }
+
+  std::string content, line;
+  while (std::getline(file_in, line)) {
+    content += line + '\n';
+  }
+
+  nlohmann::ordered_json json_content = nlohmann::json::parse(content);
+
+  int tasks_num = 0;
+  for (auto &[key, value] : json_content.items()) {
+    tasks_num++;
+  }
+
+  file_in.close();
+  std::ofstream file_out(FILE_FULL_PATH);
+  if (!file_out.is_open()) {
     return FILE_NOT_OPEN;
   }
 
@@ -44,12 +63,15 @@ inline int AddTask(const Tasks::Task *t) {
                                    : "not_defined";
 
   // json data
-  nlohmann::ordered_json task_json;
-  task_json["task"] = nlohmann::ordered_json{
-      {"title", t->title}, {"description", t->description}, {"type", type_str}};
+  json_content["task_" + std::to_string(tasks_num + 1)] =
+      nlohmann::ordered_json{{"title", t->title},
+                             {"description", t->description},
+                             {"type", type_str}};
 
   // write json data to the file
-  file << task_json.dump(4);
+  file_out << json_content.dump(4);
+
+  file_out.close();
 
   return 0;
 } // namespace Manager
@@ -66,6 +88,16 @@ inline nlohmann::ordered_json *ReadTasks(void) {
   *data_tasks = nlohmann::ordered_json::parse(file);
 
   return data_tasks;
+}
+
+inline int ClearFile(void) {
+  std::fstream file(FILE_FULL_PATH, std::ios::out | std::ios::trunc);
+  if (!file.is_open()) {
+    return FILE_NOT_OPEN;
+  }
+  file.close();
+
+  return EXIT_SUCCESS;
 }
 
 }; // namespace Manager
