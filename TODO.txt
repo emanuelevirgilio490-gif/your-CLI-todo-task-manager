@@ -1,5 +1,4 @@
 # create a tui
 # create a config.lua
-
-# tasks:
-1. fare in modo che il file si in append mode
+# check if the file is empty
+# get the PS1 from the config.lua

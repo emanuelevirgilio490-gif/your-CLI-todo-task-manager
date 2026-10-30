@@ -122,7 +122,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=productivity-cli
+CMAKE_PROJECT_NAME:STATIC=cli
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/usr/bin/ranlib
@@ -190,6 +190,15 @@ CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Path to a file.
+LUA_INCLUDE_DIR:PATH=/usr/include/lua5.4
+
+//Path to a library.
+LUA_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/liblua5.4.so
+
+//Path to a library.
+LUA_MATH_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libm.so
+
+//Path to a file.
 READLINE_INCLUDE_DIR:PATH=/usr/include
 
 //Path to a library.
@@ -197,6 +206,15 @@ READLINE_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libreadline.so
 
 //The directory containing a CMake configuration file for Readline.
 Readline_DIR:PATH=Readline_DIR-NOTFOUND
+
+//Value Computed by CMake
+cli_BINARY_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli/build
+
+//Value Computed by CMake
+cli_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+cli_SOURCE_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli
 
 //Value Computed by CMake
 productivity-cli_BINARY_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli/build
@@ -348,6 +366,14 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding Lua
+FIND_PACKAGE_MESSAGE_DETAILS_Lua:INTERNAL=[/usr/lib/x86_64-linux-gnu/liblua5.4.so;/usr/lib/x86_64-linux-gnu/libm.so][/usr/include/lua5.4][v5.4.6()]
+//ADVANCED property for variable: LUA_INCLUDE_DIR
+LUA_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: LUA_LIBRARY
+LUA_LIBRARY-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: LUA_MATH_LIBRARY
+LUA_MATH_LIBRARY-ADVANCED:INTERNAL=1
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 

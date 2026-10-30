@@ -72,8 +72,7 @@ inline int PrintTasks(void) {
   // checking if the file exist
   nlohmann::ordered_json *json_tasks = Manager::ReadTasks();
   if (json_tasks == nullptr) {
-    std::cerr << "Error: the file is not open.\n";
-    std::cout << "Cannot read the tasks\n";
+    std::cout << "Error the file is not open or is empty\n";
     return FILE_NOT_OPEN;
   }
 

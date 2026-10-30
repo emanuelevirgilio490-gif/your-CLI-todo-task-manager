@@ -115,6 +115,8 @@ public:
       last_command_enum = Manager::ValidCommands::TODAY;
     } else if (command.empty()) {
       last_command_enum = Manager::ValidCommands::NOTHING;
+    } else if (command == "delete tasks") {
+      last_command_enum = Manager::ValidCommands::DELETE_TASKS;
     }
 
     return last_command_enum;
@@ -156,6 +158,9 @@ public:
       break;
     case Manager::ValidCommands::TODAY:
       CommandExecution::PrintToday();
+      break;
+    case Manager::ValidCommands::DELETE_TASKS:
+      CommandExecution::ClearFile();
       break;
     case Manager::ValidCommands::NOTHING:
       break;

@@ -1,14 +1,33 @@
 #include "cli.hpp"
+#include "cli-colors.hpp"
+#include "cli-config.hpp"
 #include "commands_exec_CLI.hpp"
 #include "manager.hpp"
 #include "tasks.hpp"
 #include <csignal>
+#include <cstdlib>
 #include <iostream>
 // #define DEBUG_MODE
 
 // handler for ctrl + c
 void SigIntHandler(int sig) {
   std::cout << "Please do not use ctrl + c, write \"quit\" in stead\n";
+}
+
+void Init(void) {
+  std::string PS1_text{};
+  CliColors::Colors_enum PS1_color;
+
+  const int result = CliConfig::IsConfigOpen();
+  if (result != EXIT_SUCCESS) {
+    std::cout << "There was an error. Setting the standard config...\n";
+    PS1_text = CliConfig::std_config.at("text");
+
+    // TODO: add colors
+    PS1_color = CliConfig::std_config.at("color") == "red"
+                    ? CliColors::Colors_enum::RED
+                    : CliColors::Colors_enum::WHITE;
+  }
 }
 
 int main(void) {

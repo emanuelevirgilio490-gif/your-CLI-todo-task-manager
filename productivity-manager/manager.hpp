@@ -17,17 +17,15 @@ enum class ValidCommands {
   SHOW_TASK,
   CLEAR,
   TODAY,
+  DELETE_TASKS,
   NOT_DEFINED,
   NOTHING
 };
 
-inline char *commands_str[] = {(char *)"help",
-                               (char *)"quit",
-                               (char *)"add task",
-                               (char *)"show tasks",
-                               (char *)"clear",
-                               (char *)"today",
-                               nullptr};
+inline char *commands_str[] = {(char *)"help",         (char *)"quit",
+                               (char *)"add task",     (char *)"show tasks",
+                               (char *)"clear",        (char *)"today",
+                               (char *)"delete tasks", nullptr};
 
 inline int AddTask(const Tasks::Task *t) {
   std::ifstream file_in(FILE_FULL_PATH);
@@ -67,7 +65,6 @@ inline int AddTask(const Tasks::Task *t) {
       nlohmann::ordered_json{{"title", t->title},
                              {"description", t->description},
                              {"type", type_str}};
-
   // write json data to the file
   file_out << json_content.dump(4);
 
@@ -83,6 +80,11 @@ inline nlohmann::ordered_json *ReadTasks(void) {
     return nullptr;
   }
 
+  // check if the file is empty
+  if (file.peek() == std::fstream::traits_type::eof()) {
+    return nullptr;
+  }
+
   // reading the file
   nlohmann::ordered_json *data_tasks = new nlohmann::ordered_json;
   *data_tasks = nlohmann::ordered_json::parse(file);
@@ -91,6 +93,7 @@ inline nlohmann::ordered_json *ReadTasks(void) {
 }
 
 inline int ClearFile(void) {
+  // trunc = clear the file
   std::fstream file(FILE_FULL_PATH, std::ios::out | std::ios::trunc);
   if (!file.is_open()) {
     return FILE_NOT_OPEN;
