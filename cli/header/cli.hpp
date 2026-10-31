@@ -12,6 +12,8 @@ what does it do:
 #ifndef CLI_HPP
 #define CLI_HPP
 
+#include "cli-colors.hpp"
+#include "cli-config.hpp"
 #include "commands_exec_CLI.hpp"
 #include "defines.hpp"
 #include "manager.hpp"
@@ -66,16 +68,57 @@ class CLI {
   std::string last_command{};
   bool exit;
   Manager::ValidCommands last_command_enum;
+  std::string PS1_text;
+  CliColors::Colors_enum PS1_color;
 
 public:
-  CLI(void) { last_command_enum = Manager::ValidCommands::NOT_DEFINED; }
+  CLI(void) {
+    last_command_enum = Manager::ValidCommands::NOT_DEFINED;
+
+    CliConfig::Config cli_config;
+    bool error_found = false;
+
+    if (cli_config.IsConfigOpen() != EXIT_SUCCESS) {
+      std::cerr << "ERROR: cannot open the config";
+      error_found = true;
+    }
+    if (cli_config.isStateNULL()) {
+      std::cerr << "ERROR: The lua_state is NULL";
+      error_found = true;
+    }
+    if (cli_config.SearchPS1() != EXIT_SUCCESS) {
+      std::cerr << "ERROR: there is not PS1 in the fille";
+      error_found = true;
+    }
+    if (cli_config.GetPS1() == PS1_ERROR) {
+      std::cerr << "ERROR: cannot get the PS1 text\n";
+      error_found = true;
+    }
+
+    if (error_found) {
+      std::cout << "INFO: loading the default config\n";
+      PS1_text = CliConfig::std_config.at("text");
+      PS1_color = CliColors::StrToColor(CliConfig::std_config.at("color"));
+    } else {
+      std::cout << "INFO: no errors found, loading the config from the file\n";
+      PS1_text = cli_config.GetPS1();
+    }
+
+    std::cout << "Config ended.\n";
+  }
 
   // getters
   std::string GetCommand(void) {
-    char *input = AutoComplete::GetRawInput("> ");
+    char *input = AutoComplete::GetRawInput(PS1_text.c_str());
+#ifdef DEBUG_MODE
     std::cout << "raw input = " << input << '\n';
+#endif
+
     last_command = std::string(input);
+
+#ifdef DEBUG_MODE
     std::cout << "last_command = " << last_command << '\n';
+#endif
 
     add_history(input);
     free(input);

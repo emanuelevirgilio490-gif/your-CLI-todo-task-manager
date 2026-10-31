@@ -8,6 +8,7 @@ I used constant instead of only numbers for readability
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
+#include "cli-colors.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -32,5 +33,12 @@ const int8_t FILE_NOT_OPEN = -2;
 // configs ERRORS
 const int8_t CONFIG_NOT_OPENED = -10;
 const int8_t NO_PS1 = -11;
+const std::string PS1_ERROR = "__ERROR__";
+
+// config info
+const std::string CONFIG_NAME = ".prd-cli-config";
+const std::string CONFIG_EXTENSION = ".lua";
+const std::string CONFIF_FILE_FULL_NAME = CONFIG_NAME + CONFIG_EXTENSION;
+const std::string CONFIG_FULL_PATH = USER_HOME + "/" + CONFIF_FILE_FULL_NAME;
 
 #endif

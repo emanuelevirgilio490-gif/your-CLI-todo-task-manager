@@ -1,6 +1,7 @@
 #ifndef CLI_CONFIG_HPP
 #define CLI_CONFIG_HPP
 
+#include "cli-colors.hpp"
 #include "defines.hpp"
 #include <cstdlib>
 #include <iostream>
@@ -14,59 +15,81 @@ extern "C" {
 }
 
 namespace CliConfig {
-inline lua_State *L = luaL_newstate();
-
-// functions
-inline int IsConfigOpen(void) {
-  // check
-  if (luaL_dofile(L, FILE_NAME.c_str()) != LUA_OK) {
-    std::cout << "Errore: " << lua_tostring(L, -1);
-    lua_pop(L, 1);
-    lua_close(L);
-    return CONFIG_NOT_OPENED;
+class Config {
+public:
+  Config(void) {
+    L = luaL_newstate();
+    luaL_openlibs(L);
   }
+  bool isStateNULL(void) { return L == NULL; }
 
-  luaL_openlibs(L);
-  return EXIT_SUCCESS;
-}
-
-inline int SearchPS1(const std::string FILE_NAME) {
-  // get PS1 table
-  lua_getglobal(L, "PS1");
-  if (lua_istable(L, -1)) {
-    lua_getfield(L, -1, "text");
-    lua_pop(L, 1);
-  } else if (lua_isnil(L, -1)) {
-    lua_pop(L, 1);
-    return NO_PS1;
-  }
-
-  lua_close(L);
-  return EXIT_SUCCESS;
-}
-
-// call this func after the SearchPS1()
-inline const std::string GetPS1(void) {
-  std::string text{};
-
-  // get PS1 table
-  lua_getglobal(L, "PS1");
-  if (lua_istable(L, -1)) {
-    lua_getfield(L, -1, "text");
-
-    if (lua_isstring(L, -1)) {
-      text = lua_tostring(L, -1);
-    } else {
-      text = "__ERROR__";
+  int IsConfigOpen(void) {
+#ifdef DEBUG_MODE
+    std::cout << "Checking if the config is open"
+#endif
+        // check
+        if (luaL_dofile(L, CONFIG_FULL_PATH.c_str()) != LUA_OK) {
+      std::cout << "Error: " << lua_tostring(L, -1);
+      lua_pop(L, 1);
+      return CONFIG_NOT_OPENED;
     }
 
-    lua_pop(L, 1);
+    luaL_openlibs(L);
+    return EXIT_SUCCESS;
   }
-  return text;
-}
 
-inline const std::unordered_map<std::string, std::string> std_config = {
-    {"text", ">"}, {"color", "white"}};
+  int SearchPS1(void) {
+#ifdef DEBUG_MODE
+    std::cout << "Checking there is a PS1 in the config";
+#endif
+    // get PS1 table
+    lua_getglobal(L, "PS1");
+    if (lua_istable(L, -1)) {
+      lua_getfield(L, -1, "text");
+      lua_pop(L, 1);
+    } else if (lua_isnil(L, -1)) {
+      lua_pop(L, 1);
+      return NO_PS1;
+    }
+
+    return EXIT_SUCCESS;
+  }
+
+  // call this func after the SearchPS1()
+  const std::string GetPS1(void) {
+#ifdef DEBUG_MODE
+    std::cout << "Getting the PS1...";
+#endif
+
+    std::string text{};
+
+    // get PS1 table
+    lua_getglobal(L, "PS1");
+    if (lua_istable(L, -1)) {
+      lua_getfield(L, -2, "text");
+
+      if (lua_isstring(L, -2)) {
+        text = lua_tostring(L, -1);
+      } else {
+        text = PS1_ERROR;
+      }
+
+      lua_pop(L, 2);
+    }
+    return text;
+  }
+
+  ~Config(void) {
+    if (!(L == nullptr))
+      lua_close(L);
+  }
+
+private:
+  lua_State *L;
+};
+
+const std::unordered_map<std::string, std::string> std_config = {
+    {"text", "> "}, {"color", "white"}};
 }; // namespace CliConfig
 
 #endif

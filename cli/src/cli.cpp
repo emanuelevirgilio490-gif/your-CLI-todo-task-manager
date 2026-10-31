@@ -1,45 +1,27 @@
 #include "cli.hpp"
-#include "cli-colors.hpp"
-#include "cli-config.hpp"
 #include "commands_exec_CLI.hpp"
 #include "manager.hpp"
-#include "tasks.hpp"
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
-// #define DEBUG_MODE
+#define DEBUG_MODE
 
 // handler for ctrl + c
 void SigIntHandler(int sig) {
-  std::cout << "Please do not use ctrl + c, write \"quit\" in stead\n";
-}
-
-void Init(void) {
-  std::string PS1_text{};
-  CliColors::Colors_enum PS1_color;
-
-  const int result = CliConfig::IsConfigOpen();
-  if (result != EXIT_SUCCESS) {
-    std::cout << "There was an error. Setting the standard config...\n";
-    PS1_text = CliConfig::std_config.at("text");
-
-    // TODO: add colors
-    PS1_color = CliConfig::std_config.at("color") == "red"
-                    ? CliColors::Colors_enum::RED
-                    : CliColors::Colors_enum::WHITE;
-  }
+  std::cout << "\nPlease do not use ctrl + c, write \"quit\" in stead\n";
 }
 
 int main(void) {
   // signal handler
   signal(SIGINT, SigIntHandler);
 
-  CliInterface::CLI cli;
-  CliInterface::AutoComplete::SetFunction();
-
   // title
   CommandExecution::Clear();
+  CliInterface::CLI cli;
   cli.PrintTitle();
+
+  // set the function for the readline
+  CliInterface::AutoComplete::SetFunction();
 
   // main loop
   while (!cli.ShouldExit()) {
