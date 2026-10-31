@@ -46,6 +46,9 @@ public:
     lua_getglobal(L, "PS1");
     if (lua_istable(L, -1)) {
       lua_getfield(L, -1, "text");
+      if (!lua_isstring(L, -1)) {
+        return PS1_TEXT_NOT_STR;
+      }
       lua_pop(L, 1);
     } else if (lua_isnil(L, -1)) {
       lua_pop(L, 1);
@@ -66,9 +69,13 @@ public:
     // get PS1 table
     lua_getglobal(L, "PS1");
     if (lua_istable(L, -1)) {
-      lua_getfield(L, -2, "text");
+      lua_getfield(L, -1, "text");
 
-      if (lua_isstring(L, -2)) {
+      if (lua_isnil(L, -1)) {
+        std::cerr << "PS1 is nil";
+        return PS1_ERROR;
+      }
+      if (lua_isstring(L, -1)) {
         text = lua_tostring(L, -1);
       } else {
         text = PS1_ERROR;

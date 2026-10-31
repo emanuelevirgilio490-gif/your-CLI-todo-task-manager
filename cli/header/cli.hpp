@@ -87,7 +87,10 @@ public:
       error_found = true;
     }
     if (cli_config.SearchPS1() != EXIT_SUCCESS) {
-      std::cerr << "ERROR: there is not PS1 in the fille";
+      if (cli_config.SearchPS1() == PS1_TEXT_NOT_STR) {
+        std::cerr << "ERROR: PS1_text is not a string";
+      }
+      std::cerr << "ERROR: if there is not PS1_text (string) in the fille";
       error_found = true;
     }
     if (cli_config.GetPS1() == PS1_ERROR) {

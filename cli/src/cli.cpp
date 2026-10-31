@@ -4,7 +4,6 @@
 #include <csignal>
 #include <cstdlib>
 #include <iostream>
-#define DEBUG_MODE
 
 // handler for ctrl + c
 void SigIntHandler(int sig) {

@@ -1,6 +1,8 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
+#define DEBUG_MODE
+
 #include "defines.hpp"
 #include "tasks.hpp"
 #include <cstdlib>
