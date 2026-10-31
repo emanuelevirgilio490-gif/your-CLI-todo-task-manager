@@ -29,6 +29,7 @@ const uint8_t ENUM_NOT_DEFINED = 1;
 const int8_t FILE_DOES_NOT_EXIST = -1;
 const uint8_t TYPE_NOT_VALID = 2;
 const int8_t FILE_NOT_OPEN = -2;
+const int8_t FILE_EMPTY = -3;
 
 // configs ERRORS
 const int8_t CONFIG_NOT_OPENED = -10;
@@ -36,6 +37,7 @@ const int8_t NO_PS1 = -11;
 const std::string PS1_ERROR = "__ERROR__";
 const int8_t PS1_TEXT_NOT_STR = -12;
 const int8_t PS1_IS_NIL = -13;
+
 // config info
 const std::string CONFIG_NAME = ".prd-cli-config";
 const std::string CONFIG_EXTENSION = ".lua";

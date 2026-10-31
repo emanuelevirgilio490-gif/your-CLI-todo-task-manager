@@ -1,8 +1,6 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
-#define DEBUG_MODE
-
 #include "defines.hpp"
 #include "tasks.hpp"
 #include <cstdlib>
@@ -36,40 +34,66 @@ inline int AddTask(const Tasks::Task *t) {
     return FILE_NOT_OPEN;
   }
 
-  std::string content, line;
-  while (std::getline(file_in, line)) {
-    content += line + '\n';
+  bool file_empty = false;
+  if (file_in.peek() == std::fstream::traits_type::eof()) {
+    file_empty = true;
   }
-
-  nlohmann::ordered_json json_content = nlohmann::json::parse(content);
 
   int tasks_num = 0;
-  for (auto &[key, value] : json_content.items()) {
-    tasks_num++;
-  }
-
-  file_in.close();
   std::ofstream file_out(FILE_FULL_PATH);
   if (!file_out.is_open()) {
     return FILE_NOT_OPEN;
   }
 
-  // set the t.type enum -> str to write it on a json
-  const std::string type_str = t->type == Tasks::Type::URGENT     ? "urgent"
-                               : t->type == Tasks::Type::NORMAL   ? "normal"
-                               : t->type == Tasks::Type::OPTIONAL ? "optional"
-                               : t->type == Tasks::Type::NOT_DEFINED
-                                   ? "not_defined"
-                                   : "not_defined";
+  if (!file_empty) {
+    std::string content, line;
+    while (std::getline(file_in, line)) {
+      content += line + '\n';
+    }
 
-  // json data
-  json_content["task_" + std::to_string(tasks_num + 1)] =
-      nlohmann::ordered_json{{"title", t->title},
-                             {"description", t->description},
-                             {"type", type_str}};
-  // write json data to the file
-  file_out << json_content.dump(4);
+    nlohmann::ordered_json json_content = nlohmann::json::parse(content);
 
+    for (auto &[key, value] : json_content.items()) {
+      tasks_num++;
+    }
+
+    // set the t.type enum -> str to write it on a json
+    const std::string type_str = t->type == Tasks::Type::URGENT     ? "urgent"
+                                 : t->type == Tasks::Type::NORMAL   ? "normal"
+                                 : t->type == Tasks::Type::OPTIONAL ? "optional"
+                                 : t->type == Tasks::Type::NOT_DEFINED
+                                     ? "not_defined"
+                                     : "not_defined";
+
+    // json data
+    json_content["task_" + std::to_string(tasks_num + 1)] =
+        nlohmann::ordered_json{{"title", t->title},
+                               {"description", t->description},
+                               {"type", type_str}};
+    // write json data to the file
+    file_out << json_content.dump(4);
+  } else {
+    nlohmann::ordered_json json_task;
+
+    // set the t.type enum -> str to write it on a json
+    const std::string type_str = t->type == Tasks::Type::URGENT     ? "urgent"
+                                 : t->type == Tasks::Type::NORMAL   ? "normal"
+                                 : t->type == Tasks::Type::OPTIONAL ? "optional"
+                                 : t->type == Tasks::Type::NOT_DEFINED
+                                     ? "not_defined"
+                                     : "not_defined";
+
+    // json data
+    json_task["task_" + std::to_string(tasks_num + 1)] =
+        nlohmann::ordered_json{{"title", t->title},
+                               {"description", t->description},
+                               {"type", type_str}};
+
+    // write json data to the file
+    file_out << json_task.dump(4);
+  }
+
+  file_in.close();
   file_out.close();
 
   return 0;

@@ -1,4 +1,2 @@
 # create a tui
-# create a config.lua
 # check if the file is empty
-# get the PS1 from the config.lua
