@@ -78,6 +78,8 @@ class CLI {
   std::string PS1_text{};
   CliColors::Colors_enum PS1_color = CliColors::Colors_enum::WHITE;
 
+  std::string prompt;
+
 public:
   CLI(void) {
     last_command_enum = Manager::ValidCommands::NOT_DEFINED;
@@ -131,11 +133,14 @@ public:
       std::cerr << "Title is empty. Loading the std title\n";
       cli_config.LoadStdTitle(title);
     }
+
+    prompt = CliColors::escape_codes.at(PS1_color) + PS1_text +
+             CliColors::escape_codes.at(CliColors::Colors_enum::RESET);
   }
 
   // getters
   void GetCommand(void) {
-    char *input = AutoComplete::GetRawInput(PS1_text.c_str());
+    char *input = AutoComplete::GetRawInput(prompt.c_str());
 #ifdef DEBUG_MODE
     std::cout << "raw input = " << input << '\n';
 #endif
