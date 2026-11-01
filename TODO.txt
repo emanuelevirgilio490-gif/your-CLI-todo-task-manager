@@ -1,2 +1,1 @@
 # create a tui
-# check if the file is empty

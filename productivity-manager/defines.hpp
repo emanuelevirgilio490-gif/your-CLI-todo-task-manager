@@ -38,9 +38,13 @@ const std::string PS1_ERROR = "__ERROR__";
 const int8_t PS1_TEXT_NOT_STR = -12;
 const int8_t PS1_IS_NIL = -13;
 
+const uint8_t NO_PS1_TEXT = 0b10000000;
+const uint8_t NO_PS1_COLOR = 0b01000000;
+
 // config info
 const std::string CONFIG_NAME = ".prd-cli-config";
 const std::string CONFIG_EXTENSION = ".lua";
 const std::string CONFIF_FILE_FULL_NAME = CONFIG_NAME + CONFIG_EXTENSION;
 const std::string CONFIG_FULL_PATH = USER_HOME + "/" + CONFIF_FILE_FULL_NAME;
+
 #endif

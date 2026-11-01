@@ -20,11 +20,14 @@ what does it do:
 #include "tasks.hpp"
 #include <algorithm>
 #include <cctype>
+#include <cstddef>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include <optional>
 #include <readline/history.h>
 #include <readline/readline.h>
+#include <string>
 
 namespace CliInterface {
 namespace AutoComplete {
@@ -65,53 +68,73 @@ inline void SetFunction(void) {
 }; // namespace AutoComplete
 
 class CLI {
+  // control flow
   std::string last_command{};
   bool exit;
   Manager::ValidCommands last_command_enum;
-  std::string PS1_text;
-  CliColors::Colors_enum PS1_color;
+
+  // config
+  std::string title;
+  std::string PS1_text{};
+  CliColors::Colors_enum PS1_color = CliColors::Colors_enum::WHITE;
 
 public:
   CLI(void) {
     last_command_enum = Manager::ValidCommands::NOT_DEFINED;
 
     CliConfig::Config cli_config;
-    bool error_found = false;
+    bool need_text = false, need_color = false;
 
-    if (cli_config.IsConfigOpen() != EXIT_SUCCESS) {
-      std::cerr << "ERROR: cannot open the config";
-      error_found = true;
-    }
-    if (cli_config.isStateNULL()) {
-      std::cerr << "ERROR: The lua_state is NULL";
-      error_found = true;
-    }
-    if (cli_config.SearchPS1() != EXIT_SUCCESS) {
-      if (cli_config.SearchPS1() == PS1_TEXT_NOT_STR) {
-        std::cerr << "ERROR: PS1_text is not a string";
-      }
-      std::cerr << "ERROR: if there is not PS1_text (string) in the fille";
-      error_found = true;
-    }
-    if (cli_config.GetPS1() == PS1_ERROR) {
-      std::cerr << "ERROR: cannot get the PS1 text\n";
-      error_found = true;
+    // check if there was an error in opening the state/config
+    if (cli_config.isStateNULL() || cli_config.IsConfigOpen()) {
+      std::cerr
+          << "Some errors were found while opening the lua state/config\n";
+      cli_config.LoadStdConfig(PS1_text, PS1_color);
+      return;
     }
 
-    if (error_found) {
-      std::cout << "INFO: loading the default config\n";
-      PS1_text = CliConfig::std_config.at("text");
-      PS1_color = CliColors::StrToColor(CliConfig::std_config.at("color"));
-    } else {
-      std::cout << "INFO: no errors found, loading the config from the file\n";
-      PS1_text = cli_config.GetPS1();
+    // search for the PS1
+    std::cout << "Searching for the PS1...\n";
+    int PS1_found = cli_config.SearchPS1();
+
+    // check if the table is nil
+    if (PS1_found == PS1_IS_NIL) {
+      std::cerr << "PS1 is nil. Loading the std config\n";
+      cli_config.LoadStdConfig(PS1_text, PS1_color);
+      return;
     }
 
-    std::cout << "Config ended.\n";
+    // if no value where found, load the std config
+    if (PS1_found & NO_PS1_COLOR && PS1_found & NO_PS1_TEXT) {
+      std::cerr << "No PS1 color and text found\n";
+      cli_config.LoadStdConfig(PS1_text, PS1_color);
+      return;
+    }
+
+    std::optional<std::array<std::string, 2>> PS1 = cli_config.GetPS1();
+
+    if (!PS1.has_value()) {
+      std::cerr << "Cannot get data from the PS1\n";
+      cli_config.LoadStdConfig(PS1_text, PS1_color);
+      return;
+    }
+
+    PS1_text =
+        PS1_found & NO_PS1_TEXT ? CliConfig::std_config.at("text") : (*PS1)[0];
+    PS1_color = PS1_found & NO_PS1_COLOR
+                    ? CliColors::StrToColor(CliConfig::std_config.at("color"))
+                    : CliColors::StrToColor((*PS1)[1]);
+
+    // get the title
+    title = cli_config.GetTitle();
+    if (title.empty()) {
+      std::cerr << "Title is empty. Loading the std title\n";
+      cli_config.LoadStdTitle(title);
+    }
   }
 
   // getters
-  std::string GetCommand(void) {
+  void GetCommand(void) {
     char *input = AutoComplete::GetRawInput(PS1_text.c_str());
 #ifdef DEBUG_MODE
     std::cout << "raw input = " << input << '\n';
@@ -125,52 +148,47 @@ public:
 
     add_history(input);
     free(input);
-
-    return last_command;
   }
-  std::string &GetLastCommand(void) { return last_command; }
-  Manager::ValidCommands GetCommandEnum(void) { return last_command_enum; }
+  const std::string &GetLastCommand(void) { return last_command; }
+  const Manager::ValidCommands &GetCommandEnum(void) {
+    return last_command_enum;
+  }
 
   // ----------------- //
 
-  void PrintTitle(void) {
-    puts("|------------------------|");
-    puts("|                        |");
-    puts("|\033[1;0m    PRODUCTIVITY-CLI    \033[0m|");
-    puts("|                        |");
-    puts("|------------------------|");
-  }
+  void PrintTitle(void) { puts(title.c_str()); }
 
-  void ConvertToLower(std::string &s) {
-    std::transform(s.begin(), s.end(), s.begin(),
+  void ConvertToLower() {
+    std::transform(last_command.begin(), last_command.end(),
+                   last_command.begin(),
                    [](uint c) { return std::tolower(c); });
   }
 
-  Manager::ValidCommands ConvertCommand(std::string command) {
-    if (command == "quit") {
+  Manager::ValidCommands ConvertCommand(void) {
+    if (last_command == "quit") {
       last_command_enum = Manager::ValidCommands::QUIT;
-    } else if (command == "help") {
+    } else if (last_command == "help") {
       last_command_enum = Manager::ValidCommands::HELP;
-    } else if (command == "add task") {
+    } else if (last_command == "add task") {
       last_command_enum = Manager::ValidCommands::ADD_TASK;
-    } else if (command == "show tasks") {
+    } else if (last_command == "show tasks") {
       last_command_enum = Manager::ValidCommands::SHOW_TASK;
-    } else if (command == "clear") {
+    } else if (last_command == "clear") {
       last_command_enum = Manager::ValidCommands::CLEAR;
-    } else if (command == "today") {
+    } else if (last_command == "today") {
       last_command_enum = Manager::ValidCommands::TODAY;
-    } else if (command.empty()) {
+    } else if (last_command.empty()) {
       last_command_enum = Manager::ValidCommands::NOTHING;
-    } else if (command == "delete tasks") {
+    } else if (last_command == "delete tasks") {
       last_command_enum = Manager::ValidCommands::DELETE_TASKS;
     }
 
     return last_command_enum;
   }
 
-  int ExecCommand(Manager::ValidCommands c_enum) {
+  int ExecCommand(void) {
     int command_success = 0;
-    switch (c_enum) {
+    switch (last_command_enum) {
     case Manager::ValidCommands::QUIT:
       exit = true;
       std::cout << "Exit...\n";

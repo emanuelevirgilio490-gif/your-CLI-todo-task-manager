@@ -44,4 +44,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/cli.dir/DependInfo.cmake"
+  "CMakeFiles/tui.dir/DependInfo.cmake"
   )

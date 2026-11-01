@@ -25,29 +25,32 @@ int main(void) {
   // main loop
   while (!cli.ShouldExit()) {
     // get command
-    std::string command_str = cli.GetCommand();
+    cli.GetCommand();
 #ifdef DEBUG_MODE
     std::cout << "DEBUG: Last command normal = " << cli.GetLastCommand()
               << '\n';
 #endif
 
     // convert it to lower and to an enum
-    cli.ConvertToLower(cli.GetLastCommand());
-    command_str = cli.GetLastCommand();
-    Manager::ValidCommands command_enum = cli.ConvertCommand(command_str);
+    cli.ConvertToLower();
+    cli.GetLastCommand();
+    cli.ConvertCommand();
 
 #ifdef DEBUG_MODE
     std::cout << "DEBUG: Last command = " << cli.GetLastCommand() << '\n';
 #endif
 
     // Execution of the command
-    int exit_code = cli.ExecCommand(command_enum);
+    int exit_code = cli.ExecCommand();
     if (exit_code != 0) {
-      // check different exit code
+// TODO: check different exit code
+#ifdef DEBUG_MODE
       std::cout << "exit code: " << exit_code << '\n';
+#endif
     }
 
     // newline at the end of the command
+    // if it isn't the clear command
     if (!(cli.GetLastCommand() == "clear"))
       putchar('\n');
 

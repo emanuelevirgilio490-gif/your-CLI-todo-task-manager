@@ -1,3 +1,4 @@
 /home/emanuele/Desktop/programmazione/productivity-cli/build/CMakeFiles/cli.dir
+/home/emanuele/Desktop/programmazione/productivity-cli/build/CMakeFiles/tui.dir
 /home/emanuele/Desktop/programmazione/productivity-cli/build/CMakeFiles/edit_cache.dir
 /home/emanuele/Desktop/programmazione/productivity-cli/build/CMakeFiles/rebuild_cache.dir

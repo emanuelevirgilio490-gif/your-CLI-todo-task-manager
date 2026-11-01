@@ -64,6 +64,7 @@ CMAKE_BINARY_DIR = /home/emanuele/Desktop/programmazione/productivity-cli/build
 
 # The main recursive "all" target.
 all: CMakeFiles/cli.dir/all
+all: CMakeFiles/tui.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -72,6 +73,7 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/cli.dir/clean
+clean: CMakeFiles/tui.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -99,6 +101,32 @@ cli: CMakeFiles/cli.dir/rule
 CMakeFiles/cli.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/clean
 .PHONY : CMakeFiles/cli.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/tui.dir
+
+# All Build rule for target.
+CMakeFiles/tui.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tui.dir/build.make CMakeFiles/tui.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tui.dir/build.make CMakeFiles/tui.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/emanuele/Desktop/programmazione/productivity-cli/build/CMakeFiles --progress-num=3,4 "Built target tui"
+.PHONY : CMakeFiles/tui.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/tui.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/emanuele/Desktop/programmazione/productivity-cli/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/tui.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/emanuele/Desktop/programmazione/productivity-cli/build/CMakeFiles 0
+.PHONY : CMakeFiles/tui.dir/rule
+
+# Convenience name for target.
+tui: CMakeFiles/tui.dir/rule
+.PHONY : tui
+
+# clean rule for target.
+CMakeFiles/tui.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tui.dir/build.make CMakeFiles/tui.dir/clean
+.PHONY : CMakeFiles/tui.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

@@ -129,6 +129,19 @@ cli/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/build
 .PHONY : cli/fast
 
+#=============================================================================
+# Target rules for targets named tui
+
+# Build rule for target.
+tui: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tui
+.PHONY : tui
+
+# fast build rule for target.
+tui/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tui.dir/build.make CMakeFiles/tui.dir/build
+.PHONY : tui/fast
+
 cli/src/cli.o: cli/src/cli.cpp.o
 .PHONY : cli/src/cli.o
 
@@ -153,6 +166,30 @@ cli/src/cli.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/cli.dir/build.make CMakeFiles/cli.dir/cli/src/cli.cpp.s
 .PHONY : cli/src/cli.cpp.s
 
+tui/src/tui.o: tui/src/tui.cpp.o
+.PHONY : tui/src/tui.o
+
+# target to build an object file
+tui/src/tui.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tui.dir/build.make CMakeFiles/tui.dir/tui/src/tui.cpp.o
+.PHONY : tui/src/tui.cpp.o
+
+tui/src/tui.i: tui/src/tui.cpp.i
+.PHONY : tui/src/tui.i
+
+# target to preprocess a source file
+tui/src/tui.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tui.dir/build.make CMakeFiles/tui.dir/tui/src/tui.cpp.i
+.PHONY : tui/src/tui.cpp.i
+
+tui/src/tui.s: tui/src/tui.cpp.s
+.PHONY : tui/src/tui.s
+
+# target to generate assembly for a file
+tui/src/tui.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/tui.dir/build.make CMakeFiles/tui.dir/tui/src/tui.cpp.s
+.PHONY : tui/src/tui.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -162,9 +199,13 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... cli"
+	@echo "... tui"
 	@echo "... cli/src/cli.o"
 	@echo "... cli/src/cli.i"
 	@echo "... cli/src/cli.s"
+	@echo "... tui/src/tui.o"
+	@echo "... tui/src/tui.i"
+	@echo "... tui/src/tui.s"
 .PHONY : help
 
 
