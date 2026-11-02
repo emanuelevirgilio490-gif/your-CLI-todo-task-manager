@@ -9,6 +9,7 @@ executing commands from the user in the 'shell'
 #include "defines.hpp"
 #include "manager.hpp"
 #include "tasks.hpp"
+#include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -17,8 +18,18 @@ executing commands from the user in the 'shell'
 
 namespace CommandExecution {
 inline void PrintHelp(void) {
-  std::cout << "Hi! Welcome to the CLI todo task manager:\nhere you can start "
-               "planning what you wanna do today!\n";
+  // greeting
+  std::puts("Hi");
+  std::puts("Hello! Welcome to your productivity-CLI!");
+  std::puts("dividing it into tasks. Here are all the available commands:");
+
+  // command info
+  std::puts("· help (show this message)");
+  std::puts("· today (print today's date)");
+  std::puts("· show tasks (shows tasks in the file where they are saved)");
+  std::puts(
+      "· delete tasks (empties the entire file where the tasks were saved)");
+  std::puts("· add task (adds a task)");
 }
 
 inline void Quit(void) {
@@ -29,7 +40,7 @@ inline void Quit(void) {
 inline Tasks::Task *GetTask(void) {
   std::cout << "DEBUG: Entered get task\n";
   Tasks::Task *task = new Tasks::Task;
-  int type = 0;
+  int type = -1;
 
   std::cout << "Add Task:\n";
 
@@ -45,7 +56,7 @@ inline Tasks::Task *GetTask(void) {
   bool valid = false;
   do {
     // input
-    std::cout << "Add a type(0-2): ";
+    std::cout << "Add a type(0-2, 60 to exit): ";
     std::cin >> type;
 
     // check if the type is correct

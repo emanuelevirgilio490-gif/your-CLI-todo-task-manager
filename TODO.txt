@@ -1,1 +1,2 @@
 # create a tui
+# add config feature
