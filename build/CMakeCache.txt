@@ -222,6 +222,9 @@ cli_SOURCE_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli
 //Path to a library.
 ftxui:FILEPATH=ftxui-NOTFOUND
 
+//The directory containing a CMake configuration file for ftxui.
+ftxui_DIR:PATH=/usr/local/lib/cmake/ftxui
+
 //Value Computed by CMake
 productivity-cli_BINARY_DIR:STATIC=/home/emanuele/Desktop/programmazione/productivity-cli/build
 
@@ -314,6 +317,8 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//Test CMAKE_HAVE_LIBC_PTHREAD
+CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/home/emanuele/Desktop/programmazione/productivity-cli
@@ -383,6 +388,8 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding Lua
 FIND_PACKAGE_MESSAGE_DETAILS_Lua:INTERNAL=[/usr/lib/x86_64-linux-gnu/liblua5.4.so;/usr/lib/x86_64-linux-gnu/libm.so][/usr/include/lua5.4][v5.4.6()]
+//Details about finding Threads
+FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: LUA_INCLUDE_DIR
 LUA_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: LUA_LIBRARY

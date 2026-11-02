@@ -1,3 +1,3 @@
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
-cmake --build build
-build/./cli
+cmake --build build --target tui
+build/./tui

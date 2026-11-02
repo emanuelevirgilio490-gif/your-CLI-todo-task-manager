@@ -8,7 +8,6 @@ I used constant instead of only numbers for readability
 #ifndef DEFINES_HPP
 #define DEFINES_HPP
 
-#include "cli-colors.hpp"
 #include <cstdint>
 #include <cstdlib>
 #include <string>

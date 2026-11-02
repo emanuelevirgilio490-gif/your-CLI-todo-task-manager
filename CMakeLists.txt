@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(cli LANGUAGES CXX)
-# project(tui LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,13 +19,9 @@ find_path(READLINE_INCLUDE_DIR NAMES readline/readline.h)
 # find lua_lib
 find_package(Lua REQUIRED)
 
-# tui
-# find_library(ftxui REQUIRED)
-
 add_executable(cli
     cli/src/cli.cpp
 )
-add_executable(tui tui/src/tui.cpp)
 
 target_include_directories(cli PRIVATE
     cli/header
@@ -41,8 +36,19 @@ target_include_directories(cli PRIVATE ${LUA_INCLUDE_DIR})
 target_link_libraries(cli PRIVATE ${LUA_LIBRARIES})
 
 # tui
-# target_link_libraries(tui PRIVATE
-#     ftxui::screen
-#     ftxui::dom
-#     ftxui::component
-# )
+add_executable(tui tui/src/tui.cpp)
+
+find_package(ftxui CONFIG REQUIRED)
+
+target_link_libraries(tui PRIVATE
+ftxui::screen
+ftxui::dom
+ftxui::component
+)
+target_include_directories(
+tui PRIVATE
+${CMAKE_CURRENT_SOURCE_DIR}/tui/header
+
+# productivity manager
+${CMAKE_CURRENT_SOURCE_DIR}/productivity-manager
+)
