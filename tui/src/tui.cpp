@@ -1,17 +1,16 @@
 #include "tui.hpp"
+#include "manager.hpp"
 #include <iostream>
 
+#define CLEAR_SCREEN std::cout << "\e[2J\e[H"
+
 int main(void) {
-  // clears the screen
-  std::cout << "\e[2J\e[H";
+  CLEAR_SCREEN;
 
   TUIInterface::TUI tui;
+  tui.ExecTUI();
 
-  while (!tui.ShouldExit()) {
-    // do something
-    tui.ClearScreen();
-    tui.GetCommand();
-  }
+  CLEAR_SCREEN;
 
   return 0;
 }
