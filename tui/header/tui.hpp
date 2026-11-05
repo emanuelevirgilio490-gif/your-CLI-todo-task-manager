@@ -15,6 +15,7 @@
 #include <ftxui/dom/elements.hpp>
 #include <ftxui/dom/node.hpp>
 #include <ftxui/ftxui.hpp>
+#include <ftxui/screen/color.hpp>
 #include <ftxui/screen/screen.hpp>
 
 #define DEBUG_MODE
@@ -23,7 +24,7 @@
 inline std::ofstream log_file("log.txt");
 #endif
 
-enum class TUI_State { PRINT_HELP, NOTHING };
+enum class TUI_State { PRINT_HELP, NOTHING, INVALID_COMMAND };
 
 namespace TUIInterface {
 class TUI {
@@ -52,7 +53,7 @@ private:
         ftxui::Input(&current_command, "command here", input_option);
 
     ftxui::Element tasks_window =
-        ftxui::flex(ftxui::vbox(ftxui::text("hello world")));
+        ftxui::flex(ftxui::vbox(ftxui::text("hello world") | ftxui::italic));
 
     ftxui::Component exit_component =
         ftxui::CatchEvent(command_input, [&](ftxui::Event event) {
@@ -80,6 +81,15 @@ private:
             ConvertCCToLower();
             ConvertCommand();
             ExecCommand();
+
+            // check if the user need to exit
+            // (after typing a command)
+            if (ShouldExit()) {
+              screen.Exit();
+              return true;
+            }
+
+            // clear the last command
             current_command = "";
             return true;
           }
@@ -89,16 +99,33 @@ private:
 
     auto renderer = ftxui::Renderer(exit_component, [&] {
       return ftxui::vbox(
-          {ftxui::hbox({ftxui::text("> "),
-                        command_input->Render() |
-                            ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 50),
-                        ftxui::separator(), tasks_window,
+          {// TITLE
+           ftxui::text("Productivity - TUI") | ftxui::center | ftxui::bold |
+               ftxui::color(ftxui::Color::Cyan),
 
-                        // check if the TUI needs to print help
-                        state == TUI_State::PRINT_HELP
-                            ? TUIExecCommand::PrintHelp()
-                            : ftxui::text("")}) |
-           ftxui::border});
+           // Command line
+           ftxui::hbox({
+               ftxui::text("> "),
+               command_input->Render() |
+                   ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 50) |
+                   ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 1),
+
+               ftxui::separator() | ftxui::color(ftxui::Color::DarkCyan),
+
+               // TASKS
+               tasks_window,
+           }) | ftxui::borderStyled(ftxui::Color::DarkCyan),
+
+           // Output
+           state == TUI_State::INVALID_COMMAND
+               ? ftxui::text("ERROR: Command not valid") |
+                     ftxui::color(ftxui::Color::Red1) | ftxui::bold
+               : ftxui::text(""),
+
+           // check if the TUI needs to print help
+           state == TUI_State::PRINT_HELP
+               ? TUIExecCommand::PrintHelp() | ftxui::align_right
+               : ftxui::text("")});
     });
 
     screen.Loop(renderer);
@@ -116,9 +143,10 @@ private:
       current_enum = Manager::ValidCommands::QUIT;
     } else if (current_command == "help") {
       current_enum = Manager::ValidCommands::HELP;
+    } else {
+      current_enum = Manager::ValidCommands::NOT_DEFINED;
     }
   }
-
   void ExecCommand(void) {
     switch (current_enum) {
     case Manager::ValidCommands::QUIT:
@@ -130,6 +158,10 @@ private:
       break;
 
     case Manager::ValidCommands::SHOW_TASK:
+      break;
+
+    case Manager::ValidCommands::NOT_DEFINED:
+      state = TUI_State::INVALID_COMMAND;
       break;
 
     default:
