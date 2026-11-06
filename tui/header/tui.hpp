@@ -5,7 +5,6 @@
 #include "manager.hpp"
 #include <algorithm>
 #include <cctype>
-#include <fstream>
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_options.hpp>
@@ -17,12 +16,6 @@
 #include <ftxui/ftxui.hpp>
 #include <ftxui/screen/color.hpp>
 #include <ftxui/screen/screen.hpp>
-
-#define DEBUG_MODE
-
-#ifdef DEBUG_MODE
-inline std::ofstream log_file("log.txt");
-#endif
 
 enum class TUI_State { PRINT_HELP, NOTHING, INVALID_COMMAND };
 
@@ -52,8 +45,7 @@ private:
     ftxui::Component command_input =
         ftxui::Input(&current_command, "command here", input_option);
 
-    ftxui::Element tasks_window =
-        ftxui::flex(ftxui::vbox(ftxui::text("hello world") | ftxui::italic));
+    ftxui::Element tasks_window = TUIExecCommand::ShowTasks();
 
     ftxui::Component exit_component =
         ftxui::CatchEvent(command_input, [&](ftxui::Event event) {
@@ -98,34 +90,39 @@ private:
         });
 
     auto renderer = ftxui::Renderer(exit_component, [&] {
-      return ftxui::vbox(
-          {// TITLE
-           ftxui::text("Productivity - TUI") | ftxui::center | ftxui::bold |
-               ftxui::color(ftxui::Color::Cyan),
+      return ftxui::vbox({
+          // TITLE
+          ftxui::text("Productivity - TUI") | ftxui::center | ftxui::bold |
+              ftxui::color(ftxui::Color::Cyan),
 
-           // Command line
-           ftxui::hbox({
-               ftxui::text("> "),
-               command_input->Render() |
-                   ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 50) |
-                   ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 1),
+          // Command line
+          ftxui::hbox({
+              ftxui::text("> "),
+              command_input->Render() |
+                  // ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 50) |
+                  ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 1),
+          }) | ftxui::borderStyled(ftxui::Color::DarkCyan),
 
-               ftxui::separator() | ftxui::color(ftxui::Color::DarkCyan),
+          ftxui::hbox(
+              // Output
+              state == TUI_State::INVALID_COMMAND
+                  ? ftxui::text("ERROR: Command not valid") |
+                        ftxui::color(ftxui::Color::Red1) | ftxui::bold
+                  : ftxui::text(""),
 
-               // TASKS
-               tasks_window,
-           }) | ftxui::borderStyled(ftxui::Color::DarkCyan),
+              // check if the TUI needs to print help
+              state == TUI_State::PRINT_HELP ? TUIExecCommand::PrintHelp()
+                                             : ftxui::text(""),
 
-           // Output
-           state == TUI_State::INVALID_COMMAND
-               ? ftxui::text("ERROR: Command not valid") |
-                     ftxui::color(ftxui::Color::Red1) | ftxui::bold
-               : ftxui::text(""),
+              state == TUI_State::NOTHING
+                  ? ftxui::text("Hey there :3") | ftxui::bold
+                  : ftxui::text(""),
 
-           // check if the TUI needs to print help
-           state == TUI_State::PRINT_HELP
-               ? TUIExecCommand::PrintHelp() | ftxui::align_right
-               : ftxui::text("")});
+              ftxui::filler(),
+
+              // TASKS
+              tasks_window | ftxui::align_right | ftxui::border),
+      });
     });
 
     screen.Loop(renderer);

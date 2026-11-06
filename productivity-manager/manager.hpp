@@ -96,7 +96,27 @@ inline int AddTask(const Tasks::Task *t) {
   file_out.close();
 
   return 0;
-} // namespace Manager
+}
+
+inline int GetTasksNum(void) {
+  std::ifstream file_in(FILE_FULL_PATH);
+  if (!file_in.is_open()) {
+    return FILE_NOT_OPEN;
+  }
+
+  int tasks_num = 0;
+
+  nlohmann::json json_tasks = nlohmann::json::parse(file_in);
+  for (auto &[key, value] : json_tasks.items()) {
+    if (key == "task") {
+      tasks_num++;
+    }
+  }
+
+  file_in.close();
+
+  return tasks_num;
+}
 
 inline nlohmann::ordered_json *ReadTasks(void) {
   // checking if the file exist
