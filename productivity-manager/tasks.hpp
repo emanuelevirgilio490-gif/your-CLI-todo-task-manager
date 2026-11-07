@@ -20,6 +20,8 @@ struct Task {
   std::string description{};
   std::string title{};
   Type type;
+
+  Task(void) { type = Type::NOT_DEFINED; };
 };
 
 inline std::string TypeToStr(const Type t) {

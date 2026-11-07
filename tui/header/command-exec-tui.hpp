@@ -2,6 +2,7 @@
 #define COMMAND_EXEC_TUI_HPP
 
 #include "manager.hpp"
+#include "tasks.hpp"
 #include <array>
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
@@ -42,6 +43,11 @@ inline ftxui::Element ShowTasks(void) {
   delete json_data;
   return ftxui::flex(ftxui::vbox(elements));
 }
+
+// inline ftxui::Element AddTask(void) {
+//   Tasks::Task *t = new Tasks::Task;
+//   Manager::AddTask(t);
+// }
 }; // namespace TUIExecCommand
 
 #endif

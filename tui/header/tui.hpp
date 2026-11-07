@@ -3,6 +3,7 @@
 
 #include "command-exec-tui.hpp"
 #include "manager.hpp"
+#include "tasks.hpp"
 #include <algorithm>
 #include <cctype>
 #include <ftxui/component/app.hpp>
@@ -17,7 +18,7 @@
 #include <ftxui/screen/color.hpp>
 #include <ftxui/screen/screen.hpp>
 
-enum class TUI_State { PRINT_HELP, NOTHING, INVALID_COMMAND };
+enum class TUI_State { PRINT_HELP, ADD_TASK, NOTHING, INVALID_COMMAND };
 
 namespace TUIInterface {
 class TUI {
@@ -39,15 +40,30 @@ private:
     std::string &last_command = current_command;
     auto screen = ftxui::ScreenInteractive::TerminalOutput();
 
+    // selected tab
+    int selected = 0;
+
+    // command input
     ftxui::InputOption input_option;
     input_option.multiline = false;
-
     ftxui::Component command_input =
         ftxui::Input(&current_command, "command here", input_option);
 
+    // task window
     ftxui::Element tasks_window = TUIExecCommand::ShowTasks();
 
-    ftxui::Component exit_component =
+    // tabs
+    std::vector<std::string> tabs = {"TUI", "Add Task"};
+    auto tab = ftxui::Menu(&tabs, &selected);
+
+    // add task
+    auto add_task_renderer = ftxui::Renderer([&] {
+      return ftxui::window(ftxui::text("Add task:"),
+                           ftxui::hbox(ftxui::text("Hello World")));
+    });
+
+    // TUI Renderer
+    ftxui::Component input_handler =
         ftxui::CatchEvent(command_input, [&](ftxui::Event event) {
           // check if it should exit
           if (ShouldExit()) {
@@ -89,7 +105,7 @@ private:
           return false;
         });
 
-    auto renderer = ftxui::Renderer(exit_component, [&] {
+    auto TUI_Renderer = ftxui::Renderer(input_handler, [&] {
       return ftxui::vbox({
           // TITLE
           ftxui::text("Productivity - TUI") | ftxui::center | ftxui::bold |
@@ -125,6 +141,17 @@ private:
       });
     });
 
+    auto tabs_content =
+        ftxui::Container::Tab({TUI_Renderer, add_task_renderer}, &selected);
+
+    auto app = ftxui::Container::Vertical({tab, tabs_content});
+
+    auto renderer = ftxui::Renderer(app, [&] {
+      return ftxui::hbox({tabs_content->Render() | ftxui::flex,
+                          tab->Render() | ftxui::border | ftxui::align_right |
+                              ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 10)});
+    });
+
     screen.Loop(renderer);
   }
 
@@ -140,10 +167,13 @@ private:
       current_enum = Manager::ValidCommands::QUIT;
     } else if (current_command == "help") {
       current_enum = Manager::ValidCommands::HELP;
+    } else if (current_command == "add task") {
+      current_enum = Manager::ValidCommands::ADD_TASK;
     } else {
       current_enum = Manager::ValidCommands::NOT_DEFINED;
     }
   }
+
   void ExecCommand(void) {
     switch (current_enum) {
     case Manager::ValidCommands::QUIT:
@@ -155,6 +185,10 @@ private:
       break;
 
     case Manager::ValidCommands::SHOW_TASK:
+      break;
+
+    case Manager::ValidCommands::ADD_TASK:
+      state = TUI_State::ADD_TASK;
       break;
 
     case Manager::ValidCommands::NOT_DEFINED:
