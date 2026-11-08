@@ -37,6 +37,17 @@ inline std::string TypeToStr(const Type t) {
     return "not defined";
   }
 }
+
+inline Type StrToType(const std::string &s) {
+  if (s == "normal") {
+    return Type::NORMAL;
+  } else if (s == "optional") {
+    return Type::OPTIONAL;
+  } else if (s == "urgent") {
+    return Type::NOT_DEFINED;
+  }
+  return Type::NOT_DEFINED;
+}
 }; // namespace Tasks
 
 #endif

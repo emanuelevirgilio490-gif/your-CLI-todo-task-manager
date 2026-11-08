@@ -1,3 +1,6 @@
+// FIXME: Components in private (class)
+// define the components in fn calls
+// declaration in private
 #ifndef TUI_HPP
 #define TUI_HPP
 
@@ -5,20 +8,17 @@
 #include "manager.hpp"
 #include "tasks.hpp"
 #include <algorithm>
-#include <cctype>
 #include <ftxui/component/app.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/component_options.hpp>
 #include <ftxui/component/event.hpp>
 #include <ftxui/component/screen_interactive.hpp>
-#include <ftxui/dom/deprecated.hpp>
-#include <ftxui/dom/elements.hpp>
-#include <ftxui/dom/node.hpp>
 #include <ftxui/ftxui.hpp>
 #include <ftxui/screen/color.hpp>
 #include <ftxui/screen/screen.hpp>
 
 enum class TUI_State { PRINT_HELP, ADD_TASK, NOTHING, INVALID_COMMAND };
+enum class AddTaskState { NOTHING, TYPE_NOT_VALID };
 
 namespace TUIInterface {
 class TUI {
@@ -33,34 +33,98 @@ private:
   Manager::ValidCommands current_enum;
 
   TUI_State state = TUI_State::NOTHING;
+  AddTaskState add_task_state = AddTaskState::NOTHING;
   bool exit{};
+
+  // AddTaskView vars
+  Tasks::Task new_task{};
+  std::string type_str{};
+
+  // HomeView command input (ftxui::Input)
+  ftxui::Component command_input;
 
   // TUI functions
   void GetCommand(void) {
-    std::string &last_command = current_command;
     auto screen = ftxui::ScreenInteractive::TerminalOutput();
-
-    // selected tab
-    int selected = 0;
-
-    // command input
-    ftxui::InputOption input_option;
-    input_option.multiline = false;
-    ftxui::Component command_input =
-        ftxui::Input(&current_command, "command here", input_option);
 
     // task window
     ftxui::Element tasks_window = TUIExecCommand::ShowTasks();
+
+    // selected tab
+    int selected = 0;
 
     // tabs
     std::vector<std::string> tabs = {"TUI", "Add Task"};
     auto tab = ftxui::Menu(&tabs, &selected);
 
-    // add task
-    auto add_task_renderer = ftxui::Renderer([&] {
-      return ftxui::window(ftxui::text("Add task:"),
-                           ftxui::hbox(ftxui::text("Hello World")));
+    // renderers
+    auto add_task_renderer = AddTaskView(screen);
+    auto home_renderer = HomeView(screen, tasks_window); // end
+
+    auto tabs_content =
+        ftxui::Container::Tab({home_renderer, add_task_renderer}, &selected);
+
+    auto app = ftxui::Container::Vertical({tab, tabs_content});
+
+    auto renderer = ftxui::Renderer(app, [&] {
+      return ftxui::hbox({tabs_content->Render() | ftxui::flex,
+                          tab->Render() | ftxui::border | ftxui::align_right |
+                              ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 10)});
     });
+
+    screen.Loop(renderer);
+  }
+
+  ftxui::Component AddTaskView(ftxui::ScreenInteractive &screen) {
+    // Inputs option
+    ftxui::InputOption options_add_task;
+    ftxui::InputOption option_type_task;
+    option_type_task.multiline = false;
+    option_type_task.on_enter = [&] {
+      if (Tasks::StrToType(type_str) == Tasks::Type::NOT_DEFINED) {
+        add_task_state = AddTaskState::TYPE_NOT_VALID;
+      }
+    };
+
+    options_add_task.multiline = false;
+    auto Input_Title = ftxui::Input(&new_task.title, "Title", options_add_task);
+    auto Input_Descr =
+        ftxui::Input(&new_task.description, "Description", options_add_task);
+    auto Input_Type =
+        ftxui::Input(&type_str, "Type of the task", options_add_task);
+
+    auto Inputs_Task =
+        ftxui::Container::Vertical({Input_Title, Input_Descr, Input_Type});
+
+    auto input_handler_task =
+        ftxui::CatchEvent(Inputs_Task, [&](ftxui::Event event) {
+          if (event == ftxui::Event::Return) {
+            // change the Input focus
+            screen.PostEvent(ftxui::Event::Tab);
+          }
+
+          return false;
+        });
+
+    return ftxui::Renderer(input_handler_task, [&] {
+      return ftxui::window(
+          ftxui::text("Add task:"),
+          ftxui::vbox({Inputs_Task->Render(),
+
+                       add_task_state == AddTaskState::TYPE_NOT_VALID
+                           ? ftxui::text("ERROR: type not valid")
+                           : ftxui::text("")}));
+    });
+  }
+
+  ftxui::Component HomeView(ftxui::ScreenInteractive &screen,
+                            ftxui::Element tasks_window) {
+    // command input
+    ftxui::InputOption input_option;
+    input_option.multiline = false;
+
+    command_input =
+        ftxui::Input(&current_command, "command here", input_option);
 
     // TUI Renderer
     ftxui::Component input_handler =
@@ -75,14 +139,6 @@ private:
             exit = true;
             return true;
           }
-
-          // command check
-
-          // // if the last command doesen't change
-          // // we exit the function
-          // if (last_command == current_command) {
-          //   return false;
-          // }
 
           if (event == ftxui::Event::Return) {
             // check for the new command
@@ -105,7 +161,7 @@ private:
           return false;
         });
 
-    auto TUI_Renderer = ftxui::Renderer(input_handler, [&] {
+    return ftxui::Renderer(input_handler, [&] {
       return ftxui::vbox({
           // TITLE
           ftxui::text("Productivity - TUI") | ftxui::center | ftxui::bold |
@@ -140,19 +196,6 @@ private:
               tasks_window | ftxui::align_right | ftxui::border),
       });
     });
-
-    auto tabs_content =
-        ftxui::Container::Tab({TUI_Renderer, add_task_renderer}, &selected);
-
-    auto app = ftxui::Container::Vertical({tab, tabs_content});
-
-    auto renderer = ftxui::Renderer(app, [&] {
-      return ftxui::hbox({tabs_content->Render() | ftxui::flex,
-                          tab->Render() | ftxui::border | ftxui::align_right |
-                              ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 10)});
-    });
-
-    screen.Loop(renderer);
   }
 
   void ConvertCCToLower(void) {
