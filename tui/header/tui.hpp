@@ -1,6 +1,3 @@
-// FIXME: Components in private (class)
-// define the components in fn calls
-// declaration in private
 #ifndef TUI_HPP
 #define TUI_HPP
 
@@ -36,37 +33,123 @@ private:
   AddTaskState add_task_state = AddTaskState::NOTHING;
   bool exit{};
 
-  // AddTaskView vars
+  // AddTaskView data vars
   Tasks::Task new_task{};
   std::string type_str{};
 
-  // HomeView command input (ftxui::Input)
+  // TUI general components
+  ftxui::Component tab;
+  ftxui::Component add_task_renderer;
+  ftxui::Component home_renderer;
+  ftxui::Component tabs_content;
+  ftxui::Component app;
+  ftxui::Component renderer;
+
+  // AddTaskView components
+  ftxui::Component Input_Title;
+  ftxui::Component Input_Descr;
+  ftxui::Component Input_Type;
+  ftxui::Component Inputs_Task;
+  ftxui::Component input_handler_task;
+  ftxui::Component button_create_task;
+
+  // HomeView components
   ftxui::Component command_input;
+  ftxui::Component input_handler;
+
+  // HomeView Task bar
+  ftxui::Element tasks_window = TUIExecCommand::ShowTasks();
+
+  void SetupComponents(ftxui::ScreenInteractive &screen) {
+    ftxui::InputOption options_add_task;
+    ftxui::InputOption option_type_task;
+
+    option_type_task.multiline = false;
+    option_type_task.on_enter = [&] {
+      if (Tasks::StrToType(type_str) == Tasks::Type::NOT_DEFINED) {
+        add_task_state = AddTaskState::TYPE_NOT_VALID;
+      } else {
+        new_task.type = Tasks::StrToType(type_str);
+      }
+    };
+
+    options_add_task.multiline = false;
+    Input_Title = ftxui::Input(&new_task.title, "Title", options_add_task);
+    Input_Descr =
+        ftxui::Input(&new_task.description, "Description", options_add_task);
+    Input_Type = ftxui::Input(&type_str, "Type of the task", option_type_task);
+
+    Inputs_Task =
+        ftxui::Container::Vertical({Input_Title, Input_Descr, Input_Type});
+
+    input_handler_task =
+        ftxui::CatchEvent(Inputs_Task, [&](ftxui::Event event) {
+          if (event == ftxui::Event::Return) {
+            screen.PostEvent(ftxui::Event::Tab);
+          }
+          return false;
+        });
+
+    button_create_task =
+        ftxui::Button("Add Task", [&](void) { Manager::AddTask(new_task); });
+
+    ftxui::InputOption input_option;
+    input_option.multiline = false;
+
+    command_input =
+        ftxui::Input(&current_command, "command here", input_option);
+
+    input_handler = ftxui::CatchEvent(command_input, [&](ftxui::Event event) {
+      if (ShouldExit()) {
+        screen.Exit();
+      }
+
+      if (event == ftxui::Event::CtrlQ) {
+        exit = true;
+        return true;
+      }
+
+      if (event == ftxui::Event::Return) {
+        ConvertCCToLower();
+        ConvertCommand();
+        ExecCommand();
+
+        if (ShouldExit()) {
+          screen.Exit();
+          return true;
+        }
+
+        current_command = "";
+        return true;
+      }
+
+      return false;
+    });
+  }
 
   // TUI functions
   void GetCommand(void) {
     auto screen = ftxui::ScreenInteractive::TerminalOutput();
 
-    // task window
-    ftxui::Element tasks_window = TUIExecCommand::ShowTasks();
+    SetupComponents(screen);
 
     // selected tab
     int selected = 0;
 
     // tabs
     std::vector<std::string> tabs = {"TUI", "Add Task"};
-    auto tab = ftxui::Menu(&tabs, &selected);
+    tab = ftxui::Menu(&tabs, &selected);
 
-    // renderers
-    auto add_task_renderer = AddTaskView(screen);
-    auto home_renderer = HomeView(screen, tasks_window); // end
+    // renderers (usano i componenti già creati in SetupComponents)
+    add_task_renderer = AddTaskView();
+    home_renderer = HomeView();
 
-    auto tabs_content =
+    tabs_content =
         ftxui::Container::Tab({home_renderer, add_task_renderer}, &selected);
 
-    auto app = ftxui::Container::Vertical({tab, tabs_content});
+    app = ftxui::Container::Vertical({tab, tabs_content});
 
-    auto renderer = ftxui::Renderer(app, [&] {
+    renderer = ftxui::Renderer(app, [&] {
       return ftxui::hbox({tabs_content->Render() | ftxui::flex,
                           tab->Render() | ftxui::border | ftxui::align_right |
                               ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 10)});
@@ -75,37 +158,7 @@ private:
     screen.Loop(renderer);
   }
 
-  ftxui::Component AddTaskView(ftxui::ScreenInteractive &screen) {
-    // Inputs option
-    ftxui::InputOption options_add_task;
-    ftxui::InputOption option_type_task;
-    option_type_task.multiline = false;
-    option_type_task.on_enter = [&] {
-      if (Tasks::StrToType(type_str) == Tasks::Type::NOT_DEFINED) {
-        add_task_state = AddTaskState::TYPE_NOT_VALID;
-      }
-    };
-
-    options_add_task.multiline = false;
-    auto Input_Title = ftxui::Input(&new_task.title, "Title", options_add_task);
-    auto Input_Descr =
-        ftxui::Input(&new_task.description, "Description", options_add_task);
-    auto Input_Type =
-        ftxui::Input(&type_str, "Type of the task", options_add_task);
-
-    auto Inputs_Task =
-        ftxui::Container::Vertical({Input_Title, Input_Descr, Input_Type});
-
-    auto input_handler_task =
-        ftxui::CatchEvent(Inputs_Task, [&](ftxui::Event event) {
-          if (event == ftxui::Event::Return) {
-            // change the Input focus
-            screen.PostEvent(ftxui::Event::Tab);
-          }
-
-          return false;
-        });
-
+  ftxui::Component AddTaskView(void) {
     return ftxui::Renderer(input_handler_task, [&] {
       return ftxui::window(
           ftxui::text("Add task:"),
@@ -113,54 +166,15 @@ private:
 
                        add_task_state == AddTaskState::TYPE_NOT_VALID
                            ? ftxui::text("ERROR: type not valid")
-                           : ftxui::text("")}));
+                           : ftxui::text(""),
+
+                       button_create_task->Render()}));
+
+      ;
     });
   }
 
-  ftxui::Component HomeView(ftxui::ScreenInteractive &screen,
-                            ftxui::Element tasks_window) {
-    // command input
-    ftxui::InputOption input_option;
-    input_option.multiline = false;
-
-    command_input =
-        ftxui::Input(&current_command, "command here", input_option);
-
-    // TUI Renderer
-    ftxui::Component input_handler =
-        ftxui::CatchEvent(command_input, [&](ftxui::Event event) {
-          // check if it should exit
-          if (ShouldExit()) {
-            screen.Exit();
-          }
-
-          // shortcuts check
-          if (event == ftxui::Event::CtrlQ) {
-            exit = true;
-            return true;
-          }
-
-          if (event == ftxui::Event::Return) {
-            // check for the new command
-            ConvertCCToLower();
-            ConvertCommand();
-            ExecCommand();
-
-            // check if the user need to exit
-            // (after typing a command)
-            if (ShouldExit()) {
-              screen.Exit();
-              return true;
-            }
-
-            // clear the last command
-            current_command = "";
-            return true;
-          }
-
-          return false;
-        });
-
+  ftxui::Component HomeView(void) {
     return ftxui::Renderer(input_handler, [&] {
       return ftxui::vbox({
           // TITLE
@@ -171,7 +185,6 @@ private:
           ftxui::hbox({
               ftxui::text("> "),
               command_input->Render() |
-                  // ftxui::size(ftxui::WIDTH, ftxui::EQUAL, 50) |
                   ftxui::size(ftxui::HEIGHT, ftxui::EQUAL, 1),
           }) | ftxui::borderStyled(ftxui::Color::DarkCyan),
 
@@ -199,13 +212,11 @@ private:
   }
 
   void ConvertCCToLower(void) {
-    // convert the command to lower
     std::transform(current_command.begin(), current_command.end(),
                    current_command.begin(), [](char c) { return tolower(c); });
   }
 
   void ConvertCommand(void) {
-    // convert command
     if (current_command == "quit") {
       current_enum = Manager::ValidCommands::QUIT;
     } else if (current_command == "help") {

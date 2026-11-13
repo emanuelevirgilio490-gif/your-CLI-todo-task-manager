@@ -46,4 +46,7 @@ const std::string CONFIG_EXTENSION = ".lua";
 const std::string CONFIF_FILE_FULL_NAME = CONFIG_NAME + CONFIG_EXTENSION;
 const std::string CONFIG_FULL_PATH = USER_HOME + "/" + CONFIF_FILE_FULL_NAME;
 
+// tasks errors
+const int8_t TITLE_CANNOT_BE_NULL = -40;
+
 #endif

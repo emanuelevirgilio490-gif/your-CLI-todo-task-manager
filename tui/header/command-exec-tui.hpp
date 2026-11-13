@@ -20,12 +20,11 @@ inline ftxui::Element PrintHelp(void) {
 
 inline ftxui::Element ShowTasks(void) {
   nlohmann::ordered_json *json_data = Manager::ReadTasks();
-  ftxui::Element window_error = ftxui::window(
-      ftxui::text("Tasks"), {ftxui::text("Cannot read the tasks...") |
-                             ftxui::color(ftxui::Color::Red) | ftxui::bold});
 
   if (json_data == nullptr) {
-    return window_error;
+    return ftxui::window(ftxui::text("Tasks"),
+                         ftxui::text("Cannot read the tasks...") |
+                             ftxui::color(ftxui::Color::Red) | ftxui::bold);
   }
 
   std::vector<ftxui::Element> elements = {};
@@ -33,11 +32,16 @@ inline ftxui::Element ShowTasks(void) {
 
   int t_index = 1;
   for (auto &[key, value] : json_data->items()) {
-    std::string current_title = value["title"];
-    elements.push_back(
-        ftxui::text("· T" + std::to_string(t_index) + " : " + current_title));
+    if (value.contains("title")) {
+      std::string current_title = value["title"];
+      elements.push_back(
+          ftxui::text("· T" + std::to_string(t_index) + " : " + current_title));
+      t_index++;
+    }
+  }
 
-    t_index++;
+  if (t_index == 1) {
+    elements.push_back(ftxui::text("No tasks found..."));
   }
 
   delete json_data;
