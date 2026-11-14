@@ -22,9 +22,9 @@ inline ftxui::Element ShowTasks(void) {
   nlohmann::ordered_json *json_data = Manager::ReadTasks();
 
   if (json_data == nullptr) {
-    return ftxui::window(ftxui::text("Tasks"),
-                         ftxui::text("Cannot read the tasks...") |
-                             ftxui::color(ftxui::Color::Red) | ftxui::bold);
+    return ftxui::flex(
+        ftxui::vbox({ftxui::text("Cannot read the tasks...") |
+                     ftxui::color(ftxui::Color::Red) | ftxui::bold}));
   }
 
   std::vector<ftxui::Element> elements = {};

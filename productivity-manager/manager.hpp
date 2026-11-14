@@ -3,6 +3,7 @@
 
 #include "defines.hpp"
 #include "tasks.hpp"
+#include <bits/types/error_t.h>
 #include <cstdlib>
 #include <fstream>
 #include <nlohmann/detail/exceptions.hpp>
@@ -29,9 +30,7 @@ inline char *commands_str[] = {(char *)"help",         (char *)"quit",
 
 inline int AddTask(const Tasks::Task &t) {
   // Check if t data is wrong
-  if (t.type == Tasks::Type::NOT_DEFINED) {
-    return TYPE_NOT_VALID;
-  } else if (t.title == "") {
+  if (t.title.empty()) {
     return TITLE_CANNOT_BE_NULL;
   }
 
@@ -47,16 +46,13 @@ inline int AddTask(const Tasks::Task &t) {
   }
 
   int tasks_num = 0;
-  std::ofstream file_out(FILE_FULL_PATH);
-  if (!file_out.is_open()) {
-    return FILE_NOT_OPEN;
-  }
 
   if (!file_empty) {
     std::string content, line;
     while (std::getline(file_in, line)) {
       content += line + '\n';
     }
+    file_in.close();
 
     nlohmann::ordered_json json_content = nlohmann::json::parse(content);
 
@@ -77,9 +73,18 @@ inline int AddTask(const Tasks::Task &t) {
         nlohmann::ordered_json{{"title", t.title},
                                {"description", t.description},
                                {"type", type_str}};
+
+    std::ofstream file_out(FILE_FULL_PATH);
+    if (!file_out.is_open()) {
+      return FILE_NOT_OPEN;
+    }
+
     // write json data to the file
     file_out << json_content.dump(4);
+    file_out.close();
   } else {
+    file_in.close();
+
     nlohmann::ordered_json json_task;
 
     // set the t.type enum -> str to write it on a json
@@ -94,12 +99,15 @@ inline int AddTask(const Tasks::Task &t) {
     json_task["task_" + std::to_string(tasks_num + 1)] = nlohmann::ordered_json{
         {"title", t.title}, {"description", t.description}, {"type", type_str}};
 
+    std::ofstream file_out(FILE_FULL_PATH);
+    if (!file_out.is_open()) {
+      return FILE_NOT_OPEN;
+    }
+
     // write json data to the file
     file_out << json_task.dump(4);
+    file_out.close();
   }
-
-  file_in.close();
-  file_out.close();
 
   return 0;
 }

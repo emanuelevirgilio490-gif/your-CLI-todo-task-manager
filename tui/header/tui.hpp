@@ -2,6 +2,7 @@
 #define TUI_HPP
 
 #include <fstream>
+#include <ftxui/dom/elements.hpp>
 #include <vector>
 #define DEBUG
 
@@ -23,7 +24,7 @@ inline std::ofstream file_log("log.txt");
 #endif
 
 enum class TUI_State { PRINT_HELP, ADD_TASK, NOTHING, INVALID_COMMAND };
-enum class AddTaskState { NOTHING, TYPE_NOT_VALID };
+enum class AddTaskState { NOTHING, ADD_TASK, TYPE_NOT_VALID };
 
 namespace TUIInterface {
 class TUI {
@@ -57,13 +58,19 @@ private:
   ftxui::Component renderer;
 
   // AddTaskView components
+  // Inputs for the task
   ftxui::Component Input_Title;
   ftxui::Component Input_Descr;
   ftxui::Component Input_Type;
   ftxui::Component Inputs_Task;
   ftxui::Component input_handler_task;
-  ftxui::Component button_create_task;
+
+  // container for all of the inputs and buttons
   ftxui::Component add_task_container;
+
+  // button
+  ftxui::ButtonOption b_option_task;
+  ftxui::Component button_create_task;
 
   // HomeView components
   ftxui::Component command_input;
@@ -96,11 +103,33 @@ private:
           return false;
         });
 
-    button_create_task = ftxui::Button("Add Task", [&](void) {
+    b_option_task.transform = [&](const ftxui::EntryState &state) {
+      return ftxui::text(state.label) |
+             ftxui::borderStyled(ftxui::Color::Cyan1);
+    };
+
+    button_create_task = ftxui::Button(
+        "Add Task",
+        [&](void) {
 #ifdef DEBUG
-      file_log << "Bottone cliccato";
+          file_log << "Bottone cliccato, index per il type "
+                   << selected_index_type << "\n";
 #endif
-    });
+          new_task.type =
+              Tasks::StrToType(type_task_entries[selected_index_type]);
+          int success = Manager::AddTask(new_task);
+#ifdef DEBUG
+          file_log << "Task added with exit code " << success << '\n';
+#endif
+
+          // reset the new_task
+          new_task.type = Tasks::Type::NOT_DEFINED;
+          new_task.description = "";
+          new_task.title = "";
+
+          add_task_state = AddTaskState::ADD_TASK;
+        },
+        b_option_task);
 
     add_task_container =
         ftxui::Container::Vertical({Inputs_Task, button_create_task});
@@ -205,9 +234,13 @@ private:
                            ftxui::vbox({
                                add_task_container->Render(),
 
+                               // checking the state to print out
+                               // if the task is added
                                add_task_state == AddTaskState::TYPE_NOT_VALID
                                    ? ftxui::text("ERROR: type not valid")
-                                   : ftxui::text(""),
+                               : add_task_state == AddTaskState::ADD_TASK
+                                   ? ftxui::text("Task Added!")
+                                   : ftxui::text("")
 
                                // button_create_task->Render()
                            }));
@@ -216,6 +249,10 @@ private:
 
   ftxui::Component HomeView(void) {
     return ftxui::Renderer(input_handler, [&] {
+      tasks_window = TUIExecCommand::ShowTasks();
+
+      // reset the add task state
+      add_task_state = AddTaskState::NOTHING;
       return ftxui::vbox({
           // TITLE
           ftxui::text("Productivity - TUI") | ftxui::center | ftxui::bold |
