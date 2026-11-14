@@ -1,6 +1,10 @@
 #ifndef TUI_HPP
 #define TUI_HPP
 
+#include <fstream>
+#include <vector>
+#define DEBUG
+
 #include "command-exec-tui.hpp"
 #include "manager.hpp"
 #include "tasks.hpp"
@@ -13,6 +17,10 @@
 #include <ftxui/ftxui.hpp>
 #include <ftxui/screen/color.hpp>
 #include <ftxui/screen/screen.hpp>
+
+#ifdef DEBUG
+inline std::ofstream file_log("log.txt");
+#endif
 
 enum class TUI_State { PRINT_HELP, ADD_TASK, NOTHING, INVALID_COMMAND };
 enum class AddTaskState { NOTHING, TYPE_NOT_VALID };
@@ -37,6 +45,9 @@ private:
   Tasks::Task new_task{};
   std::string type_str{};
 
+  int selected_index_type = 0;
+  const std::vector<std::string> &type_task_entries = Tasks::type_to_str;
+
   // TUI general components
   ftxui::Component tab;
   ftxui::Component add_task_renderer;
@@ -52,6 +63,7 @@ private:
   ftxui::Component Inputs_Task;
   ftxui::Component input_handler_task;
   ftxui::Component button_create_task;
+  ftxui::Component add_task_container;
 
   // HomeView components
   ftxui::Component command_input;
@@ -62,23 +74,17 @@ private:
 
   void SetupComponents(ftxui::ScreenInteractive &screen) {
     ftxui::InputOption options_add_task;
-    ftxui::InputOption option_type_task;
-
-    option_type_task.multiline = false;
-    option_type_task.on_enter = [&] {
-      if (Tasks::StrToType(type_str) == Tasks::Type::NOT_DEFINED) {
-        add_task_state = AddTaskState::TYPE_NOT_VALID;
-      } else {
-        new_task.type = Tasks::StrToType(type_str);
-      }
-    };
 
     options_add_task.multiline = false;
+    options_add_task.on_enter = [&] { screen.PostEvent(ftxui::Event::Tab); };
+
     Input_Title = ftxui::Input(&new_task.title, "Title", options_add_task);
     Input_Descr =
         ftxui::Input(&new_task.description, "Description", options_add_task);
-    Input_Type = ftxui::Input(&type_str, "Type of the task", option_type_task);
 
+    Input_Type = ftxui::Menu(type_task_entries, &selected_index_type);
+
+    // container of the inputs
     Inputs_Task =
         ftxui::Container::Vertical({Input_Title, Input_Descr, Input_Type});
 
@@ -90,8 +96,25 @@ private:
           return false;
         });
 
-    button_create_task =
-        ftxui::Button("Add Task", [&](void) { Manager::AddTask(new_task); });
+    button_create_task = ftxui::Button("Add Task", [&](void) {
+#ifdef DEBUG
+      file_log << "Bottone cliccato";
+#endif
+    });
+
+    add_task_container =
+        ftxui::Container::Vertical({Inputs_Task, button_create_task});
+
+    // global events
+    ftxui::ComponentDecorator exit_events =
+        ftxui::CatchEvent([&](ftxui::Event event) {
+          if (event == ftxui::Event::CtrlQ) {
+            screen.Exit();
+            return true;
+          }
+          return false;
+        });
+    Manager::AddTask(new_task);
 
     ftxui::InputOption input_option;
     input_option.multiline = false;
@@ -101,11 +124,18 @@ private:
 
     input_handler = ftxui::CatchEvent(command_input, [&](ftxui::Event event) {
       if (ShouldExit()) {
+#ifdef DEBUG
+        file_log.close();
+#endif
         screen.Exit();
       }
 
       if (event == ftxui::Event::CtrlQ) {
+#ifdef DEBUG
+        file_log.close();
+#endif
         exit = true;
+        screen.Exit();
         return true;
       }
 
@@ -115,6 +145,9 @@ private:
         ExecCommand();
 
         if (ShouldExit()) {
+#ifdef DEBUG
+          file_log.close();
+#endif
           screen.Exit();
           return true;
         }
@@ -130,6 +163,7 @@ private:
   // TUI functions
   void GetCommand(void) {
     auto screen = ftxui::ScreenInteractive::TerminalOutput();
+    screen.TrackMouse(true);
 
     SetupComponents(screen);
 
@@ -148,6 +182,13 @@ private:
         ftxui::Container::Tab({home_renderer, add_task_renderer}, &selected);
 
     app = ftxui::Container::Vertical({tab, tabs_content});
+    app = ftxui::CatchEvent(app, [&](ftxui::Event event) {
+      if (event == ftxui::Event::CtrlQ) {
+        screen.Exit();
+        return true;
+      }
+      return false;
+    });
 
     renderer = ftxui::Renderer(app, [&] {
       return ftxui::hbox({tabs_content->Render() | ftxui::flex,
@@ -159,18 +200,17 @@ private:
   }
 
   ftxui::Component AddTaskView(void) {
-    return ftxui::Renderer(input_handler_task, [&] {
-      return ftxui::window(
-          ftxui::text("Add task:"),
-          ftxui::vbox({Inputs_Task->Render(),
+    return ftxui::Renderer(add_task_container, [&] {
+      return ftxui::window(ftxui::text("Add task:"),
+                           ftxui::vbox({
+                               add_task_container->Render(),
 
-                       add_task_state == AddTaskState::TYPE_NOT_VALID
-                           ? ftxui::text("ERROR: type not valid")
-                           : ftxui::text(""),
+                               add_task_state == AddTaskState::TYPE_NOT_VALID
+                                   ? ftxui::text("ERROR: type not valid")
+                                   : ftxui::text(""),
 
-                       button_create_task->Render()}));
-
-      ;
+                               // button_create_task->Render()
+                           }));
     });
   }
 
